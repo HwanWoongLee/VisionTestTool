@@ -1,8 +1,12 @@
 ﻿#pragma once
 #include "CTab1.h"
 
+#define IDC_TIMER_LUT 60001
+
 class CVisionTestToolDlg;
 class CImageProcess;
+class LUTManipulator;
+
 class CTab2 : public CTab1
 {
 	DECLARE_DYNAMIC(CTab2)
@@ -17,8 +21,9 @@ public:
 #endif
 protected:
 	CVisionTestToolDlg*		m_pParent = nullptr;
+	LUTManipulator*			m_pLUT = nullptr;
 
-	
+	//std::thread*			m_pThreadLUT = nullptr;
 
 private:
 	CMatView	m_markView;
@@ -38,7 +43,11 @@ private:
 	CComboBox	m_comboContourMethod;
 
 	CButton		m_checkCenter;
+	CButton		m_checkLUT;
 	
+
+private:
+	void ApplyLUT();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
@@ -57,4 +66,7 @@ public:
 	afx_msg void OnBnClickedBtnConvexHull();
 	afx_msg void OnBnClickedBtnMatchingLoadMark();
 	afx_msg void OnBnClickedBtnMatchingTemplate();
+	afx_msg void OnBnClickedBtnInitLut();
+	afx_msg void OnBnClickedBtnApplyLut();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };

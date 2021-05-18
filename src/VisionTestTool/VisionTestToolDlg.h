@@ -39,7 +39,7 @@ private:
 	CTabCtrl		m_Tab;
 	CTab1*			m_pTab1;
 	CTab2*			m_pTab2;
-	LUTManipulator* m_pLUT;
+	// LUTManipulator* m_pLUT;
 
 	CCameraPaneWnd* m_pCamera;
 	
@@ -78,5 +78,4 @@ public:
 	CSliderCtrl m_sliderGamma;
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg void OnEnChangeEditGammaValue();
-	afx_msg void OnBnClickedBtnLut();
 };

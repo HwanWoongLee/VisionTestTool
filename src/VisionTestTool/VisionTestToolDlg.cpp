@@ -6,7 +6,7 @@
 #include "CTab1.h"
 #include "CTab2.h"
 #include "ImageProcess.h"
-#include "LUTManipulator.h"
+// #include "LUTManipulator.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -45,7 +45,6 @@ BEGIN_MESSAGE_MAP(CVisionTestToolDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_GAMMA_CORRECTION, &CVisionTestToolDlg::OnBnClickedBtnGammaCorrection)
 	ON_WM_HSCROLL()
 	ON_EN_CHANGE(IDC_EDIT_GAMMA_VALUE, &CVisionTestToolDlg::OnEnChangeEditGammaValue)
-	ON_BN_CLICKED(IDC_BTN_LUT, &CVisionTestToolDlg::OnBnClickedBtnLut)
 END_MESSAGE_MAP()
 
 
@@ -77,9 +76,7 @@ BOOL CVisionTestToolDlg::OnInitDialog()
 	m_pTab2->MoveWindow(0, 20, rect.Width(), rect.Height() - 20);
 	m_pTab2->ShowWindow(SW_HIDE);
 
-	m_pLUT = new LUTManipulator(this);
-	m_pLUT->Create(IDD_DIALOG_LUT, this);
-	m_pLUT->ShowWindow(SW_HIDE);
+
 
 
 	// Create Camera window
@@ -472,10 +469,4 @@ void CVisionTestToolDlg::OnEnChangeEditGammaValue()
 	double dPos = _ttof(str);
 	m_sliderGamma.SetPos(dPos * 10);
 
-}
-
-
-void CVisionTestToolDlg::OnBnClickedBtnLut()
-{
-	m_pLUT->ShowWindow(SW_SHOW);
 }

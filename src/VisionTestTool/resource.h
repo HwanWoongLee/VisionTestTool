@@ -58,7 +58,6 @@
 #define IDC_BTN_GAMMA_CORRECTION        1031
 #define IDC_BTN_SOBEL                   1032
 #define IDC_BTN_RANSAC_ELLIPSE          1032
-#define IDC_BTN_LUT                     1032
 #define IDC_EDIT_SOBEL_SIZE             1033
 #define IDC_EDIT_RANSAC_THRESH1         1033
 #define IDC_EDIT_HOUGH_CIRCLE_PARAM1    1034
@@ -90,6 +89,11 @@
 #define IDC_STATIC_MATCHING_MARK        1048
 #define IDC_BTN_MATCHING_TEMPLATE       1049
 #define IDC_SLIDER_GAMMA_VALUE          1049
+#define IDC_BTN_INIT_LUT                1050
+#define IDC_BTN_APPLY_LUT               1051
+#define IDC_STATIC_LUT_GRAPH_VIEW       1052
+#define IDC_CHECK1                      1053
+#define IDC_CHECK_APPLY_LUT             1053
 
 // Next default values for new objects
 // 
@@ -97,7 +101,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        139
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1052
+#define _APS_NEXT_CONTROL_VALUE         1054
 #define _APS_NEXT_SYMED_VALUE           105
 #endif
 #endif

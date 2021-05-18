@@ -7,6 +7,7 @@
 #include "afxdialogex.h"
 #include "ImageProcess.h"
 #include "VisionTestToolDlg.h"
+#include "LUTManipulator.h";
 
 // CTab2 대화 상자
 
@@ -22,7 +23,25 @@ CTab2::CTab2(CWnd* pParent /*=nullptr*/)
 
 CTab2::~CTab2()
 {
+	//if (m_pThreadLUT->joinable())
+	//	m_pThreadLUT->join();
+	//
+	//SAFE_DELETE(m_pThreadLUT);
+}
 
+void CTab2::ApplyLUT() {
+	if (m_pLUT) {
+		cv::Mat lut = m_pLUT->GetLUT();
+		cv::Mat image = GetImage();
+
+		if (lut.empty() || image.empty())
+			return;
+
+		cv::Mat dst;
+		cv::LUT(image, lut, dst);
+
+		SetImage(dst);
+	}
 }
 
 void CTab2::DoDataExchange(CDataExchange* pDX)
@@ -38,6 +57,7 @@ void CTab2::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_RESIZE, m_editResize);
 	DDX_Control(pDX, IDC_COMBO_CONTOUR_MODE, m_comboContourMode);
 	DDX_Control(pDX, IDC_COMBO_CONTOUR_METHOD, m_comboContourMethod);
+	DDX_Control(pDX, IDC_CHECK_APPLY_LUT, m_checkLUT);
 }
 
 
@@ -53,6 +73,9 @@ BEGIN_MESSAGE_MAP(CTab2, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_CONVEX_HULL, &CTab2::OnBnClickedBtnConvexHull)
 	ON_BN_CLICKED(IDC_BTN_MATCHING_LOAD_MARK, &CTab2::OnBnClickedBtnMatchingLoadMark)
 	ON_BN_CLICKED(IDC_BTN_MATCHING_TEMPLATE, &CTab2::OnBnClickedBtnMatchingTemplate)
+	ON_BN_CLICKED(IDC_BTN_INIT_LUT, &CTab2::OnBnClickedBtnInitLut)
+	ON_BN_CLICKED(IDC_BTN_APPLY_LUT, &CTab2::OnBnClickedBtnApplyLut)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -92,14 +115,40 @@ void CTab2::OnShowWindow(BOOL bShow, UINT nStatus)
 		if (!m_markView.Create(NULL, NULL, WS_VISIBLE | WS_CHILD | WS_BORDER, CRect(), this, IDC_STATIC_MATCHING_MARK)) {
 			return;
 		}
+
 		auto pWnd = GetDlgItem(IDC_STATIC_MATCHING_MARK);
+		CRect rect;
 		if (pWnd) {
-			CRect rect;
 			pWnd->GetWindowRect(&rect);
 			ScreenToClient(rect);
 			m_markView.MoveWindow(rect);
 		}
-	}
+
+        pWnd = GetDlgItem(IDC_STATIC_LUT_GRAPH_VIEW);
+        if (pWnd) {
+            if (!m_pLUT) {
+                pWnd->GetWindowRect(&rect);
+                ScreenToClient(rect);
+
+                m_pLUT = new LUTManipulator(this);
+                m_pLUT->Create(IDD_DIALOG_LUT, this);
+				rect.DeflateRect(5, 15, 5, 5);
+				m_pLUT->MoveWindow(rect);
+                m_pLUT->ShowWindow(SW_SHOW);
+            }
+        }
+
+		SetTimer(IDC_TIMER_LUT, 10, NULL);
+		//m_pThreadLUT = new std::thread([&]() {
+		//		while (true) {
+		//			if (m_checkLUT.GetCheck()) {
+		//				ApplyLUT();
+		//			}
+		//			this_thread::sleep_for(10ms);
+		//		}
+		//	}
+		//);
+    }
 	return;
 }
 
@@ -417,4 +466,28 @@ void CTab2::OnBnClickedBtnMatchingTemplate()
 	SetImage(image);
 
 	return;
+}
+
+
+void CTab2::OnBnClickedBtnInitLut()
+{
+	if (m_pLUT) {
+		m_pLUT->InitPts();
+	}
+}
+
+
+void CTab2::OnBnClickedBtnApplyLut()
+{
+	ApplyLUT();
+}
+
+
+void CTab2::OnTimer(UINT_PTR nIDEvent)
+{
+	if (nIDEvent == IDC_TIMER_LUT) {
+		if(m_checkLUT.GetCheck())
+			ApplyLUT();
+	}
+	CTab1::OnTimer(nIDEvent);
 }

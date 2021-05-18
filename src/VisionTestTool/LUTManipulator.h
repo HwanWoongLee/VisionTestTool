@@ -32,7 +32,7 @@ private:
 
 public:
 	void InitPts();
-	// void GetLUT();
+	cv::Mat GetLUT();
 
 
 protected:

@@ -7,8 +7,6 @@
 #include "afxdialogex.h"
 
 
-// LUTManipulator 대화 상자
-
 IMPLEMENT_DYNAMIC(LUTManipulator, CDialogEx)
 
 LUTManipulator::LUTManipulator(CWnd* pParent /*=nullptr*/)
@@ -31,7 +29,29 @@ void LUTManipulator::InitPts() {
 	m_pts.push_back(cv::Point(0, 0));
 	m_pts.push_back(cv::Point(255, 255));
 
+	if(IsWindow(m_hWnd))
+		Invalidate(FALSE);
 }
+
+cv::Mat LUTManipulator::GetLUT() {
+	int nCount = m_params.size();
+	cv::Mat lut(1, 256, CV_8UC3);
+
+	for (int x = 0; x < 256; ++x) {
+		float fy = 0;
+		for (int i = 0; i < nCount; ++i) {
+			fy += m_params[i] * pow(x, i);
+		}
+
+		auto data = lut.data;
+		data[x * 3 + 0] = fy;
+		data[x * 3 + 1] = fy;
+		data[x * 3 + 2] = fy;
+	}
+
+	return lut;
+}
+
 
 void LUTManipulator::DrawGraph(CDC& pDC, double dWidth, double dHeight) {
 	if (m_pts.size() < 2)
@@ -76,10 +96,10 @@ bool LUTManipulator::CheckMousePointInLine(const CPoint& pt) {
 		fy += m_params[i] * pow(real_pt.x, i);
 	}
 	
-    if (abs(fy - real_pt.y) > 2)
-        return false;
+    if (abs(fy - real_pt.y) < 5)
+        return true;
 
-	return true;
+	return false;
 }
 
 bool LUTManipulator::CheckInPoint(const CPoint& pt, int& index_pt) {
@@ -115,10 +135,10 @@ void LUTManipulator::OnPaint()
 	CRect rect;
 	GetClientRect(&rect);
 	
-	pDC.FillSolidRect(&rect, RGB(200, 200, 200));
+	pDC.FillSolidRect(&rect, RGB(20, 20, 20));
 
 	CPen pen, * oldPen;
-	pen.CreatePen(PS_DOT, 1, RGB(180, 180, 180));
+	pen.CreatePen(PS_DOT, 1, RGB(40, 40, 40));
 	oldPen = pDC.SelectObject(&pen);
 
 	m_dWidth = rect.Width() / 255.0;
@@ -146,7 +166,7 @@ void LUTManipulator::OnPaint()
 	pen.DeleteObject();
 
 	for (int i = 0; i < m_pts.size(); ++i) {
-		CRect ptRect = CRect(m_pts[i].x * m_dWidth - 5, m_pts[i].y * m_dHeight - 5, m_pts[i].x * m_dWidth + 5, m_pts[i].y * m_dHeight + 5);
+		CRect ptRect = CRect(m_pts[i].x * m_dWidth - 3, m_pts[i].y * m_dHeight - 3, m_pts[i].x * m_dWidth + 3, m_pts[i].y * m_dHeight + 3);
 		pDC.FillSolidRect(ptRect, RGB(255, 0, 0));
 	}
 
