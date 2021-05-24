@@ -28,8 +28,6 @@ CTab1::CTab1(CWnd* pParent /*=nullptr*/)
 	m_test4Pts.push_back(cv::Point(2151, 560));
 	m_test4Pts.push_back(cv::Point(2151, 650));
 
-	//m_test5Pts.push_back(cv::Point(1152, 660));
-	//m_test5Pts.push_back(cv::Point(3197, 660));
 	m_test5Pts.push_back(cv::Point(665, 411));
 	m_test5Pts.push_back(cv::Point(2893, 411));
 
@@ -94,20 +92,20 @@ cv::Mat	CTab1::RotateImage(cv::Mat image, double dAngle) {
 }
 
 BEGIN_MESSAGE_MAP(CTab1, CDialogEx)
-	ON_BN_CLICKED(IDC_BTN_BLUR, &CTab1::OnBnClickedBtnBlur)
-	ON_BN_CLICKED(IDC_BTN_GAUSSIAN_BLUR, &CTab1::OnBnClickedBtnGaussianBlur)
-	ON_BN_CLICKED(IDC_BTN_MEDIAN_BLUR, &CTab1::OnBnClickedBtnMedianBlur)
-	ON_BN_CLICKED(IDC_BTN_BILATERAL_BLUR, &CTab1::OnBnClickedBtnBilateralBlur)
+	ON_BN_CLICKED(IDC_BTN_BLUR,				&CTab1::OnBnClickedBtnBlur)
+	ON_BN_CLICKED(IDC_BTN_GAUSSIAN_BLUR,	&CTab1::OnBnClickedBtnGaussianBlur)
+	ON_BN_CLICKED(IDC_BTN_MEDIAN_BLUR,		&CTab1::OnBnClickedBtnMedianBlur)
+	ON_BN_CLICKED(IDC_BTN_BILATERAL_BLUR,	&CTab1::OnBnClickedBtnBilateralBlur)
+	ON_BN_CLICKED(IDC_BTN_MORPH,			&CTab1::OnBnClickedBtnMorph)
+	ON_BN_CLICKED(IDC_BTN_THRESHOLD,		&CTab1::OnBnClickedBtnThreshold)
+	ON_BN_CLICKED(IDC_BTN_ADAPTIVE_THRESH,	&CTab1::OnBnClickedBtnAdaptiveThresh)
+	ON_BN_CLICKED(IDC_BTN_CANNY,			&CTab1::OnBnClickedBtnCanny)
+	ON_BN_CLICKED(IDC_BTN_SOBEL,			&CTab1::OnBnClickedBtnSobel)
+	ON_BN_CLICKED(IDC_BTN_HOUGH_CIRCLE,		&CTab1::OnBnClickedBtnHoughCircle)
+	ON_BN_CLICKED(IDC_BTN_HOUGH_LINE,		&CTab1::OnBnClickedBtnHoughLine)
+	ON_BN_CLICKED(IDC_BTN_DENOISE,			&CTab1::OnBnClickedBtnDenoise)
+	ON_BN_CLICKED(IDC_BTN_TEST,				&CTab1::OnBnClickedBtnTest)
 	ON_WM_SHOWWINDOW()
-	ON_BN_CLICKED(IDC_BTN_MORPH, &CTab1::OnBnClickedBtnMorph)
-	ON_BN_CLICKED(IDC_BTN_THRESHOLD, &CTab1::OnBnClickedBtnThreshold)
-	ON_BN_CLICKED(IDC_BTN_ADAPTIVE_THRESH, &CTab1::OnBnClickedBtnAdaptiveThresh)
-	ON_BN_CLICKED(IDC_BTN_CANNY, &CTab1::OnBnClickedBtnCanny)
-	ON_BN_CLICKED(IDC_BTN_SOBEL, &CTab1::OnBnClickedBtnSobel)
-	ON_BN_CLICKED(IDC_BTN_HOUGH_CIRCLE, &CTab1::OnBnClickedBtnHoughCircle)
-	ON_BN_CLICKED(IDC_BTN_HOUGH_LINE, &CTab1::OnBnClickedBtnHoughLine)
-	ON_BN_CLICKED(IDC_BTN_DENOISE, &CTab1::OnBnClickedBtnDenoise)
-	ON_BN_CLICKED(IDC_BTN_TEST, &CTab1::OnBnClickedBtnTest)
 	ON_WM_HSCROLL()
 END_MESSAGE_MAP()
 

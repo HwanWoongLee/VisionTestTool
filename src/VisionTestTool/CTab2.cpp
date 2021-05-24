@@ -62,19 +62,19 @@ void CTab2::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CTab2, CDialogEx)
-	ON_BN_CLICKED(IDC_BTN_RANSAC_LINE, &CTab2::OnBnClickedBtnRansacLine)
-	ON_BN_CLICKED(IDC_BTN_RANSAC_CIRCLE, &CTab2::OnBnClickedBtnRansacCircle)
-	ON_BN_CLICKED(IDC_BTN_RANSAC_ELLIPSE, &CTab2::OnBnClickedBtnRansacEllipse)
-	ON_WM_SHOWWINDOW()
+	ON_BN_CLICKED(IDC_BTN_RANSAC_LINE,			&CTab2::OnBnClickedBtnRansacLine)
+	ON_BN_CLICKED(IDC_BTN_RANSAC_CIRCLE,		&CTab2::OnBnClickedBtnRansacCircle)
+	ON_BN_CLICKED(IDC_BTN_RANSAC_ELLIPSE,		&CTab2::OnBnClickedBtnRansacEllipse)
+	ON_EN_CHANGE(IDC_EDIT_ROTATE,				&CTab2::OnEnChangeEditRotate)
+	ON_BN_CLICKED(IDC_BTN_RESIZE,				&CTab2::OnBnClickedBtnResize)
+	ON_BN_CLICKED(IDC_BTN_CONTOUR,				&CTab2::OnBnClickedBtnContour)
+	ON_BN_CLICKED(IDC_BTN_CONVEX_HULL,			&CTab2::OnBnClickedBtnConvexHull)
+	ON_BN_CLICKED(IDC_BTN_MATCHING_LOAD_MARK,	&CTab2::OnBnClickedBtnMatchingLoadMark)
+	ON_BN_CLICKED(IDC_BTN_MATCHING_TEMPLATE,	&CTab2::OnBnClickedBtnMatchingTemplate)
+	ON_BN_CLICKED(IDC_BTN_INIT_LUT,				&CTab2::OnBnClickedBtnInitLut)
+	ON_BN_CLICKED(IDC_BTN_APPLY_LUT,			&CTab2::OnBnClickedBtnApplyLut)
 	ON_WM_HSCROLL()
-	ON_EN_CHANGE(IDC_EDIT_ROTATE, &CTab2::OnEnChangeEditRotate)
-	ON_BN_CLICKED(IDC_BTN_RESIZE, &CTab2::OnBnClickedBtnResize)
-	ON_BN_CLICKED(IDC_BTN_CONTOUR, &CTab2::OnBnClickedBtnContour)
-	ON_BN_CLICKED(IDC_BTN_CONVEX_HULL, &CTab2::OnBnClickedBtnConvexHull)
-	ON_BN_CLICKED(IDC_BTN_MATCHING_LOAD_MARK, &CTab2::OnBnClickedBtnMatchingLoadMark)
-	ON_BN_CLICKED(IDC_BTN_MATCHING_TEMPLATE, &CTab2::OnBnClickedBtnMatchingTemplate)
-	ON_BN_CLICKED(IDC_BTN_INIT_LUT, &CTab2::OnBnClickedBtnInitLut)
-	ON_BN_CLICKED(IDC_BTN_APPLY_LUT, &CTab2::OnBnClickedBtnApplyLut)
+	ON_WM_SHOWWINDOW()
 	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
@@ -139,15 +139,6 @@ void CTab2::OnShowWindow(BOOL bShow, UINT nStatus)
         }
 
 		SetTimer(IDC_TIMER_LUT, 10, NULL);
-		//m_pThreadLUT = new std::thread([&]() {
-		//		while (true) {
-		//			if (m_checkLUT.GetCheck()) {
-		//				ApplyLUT();
-		//			}
-		//			this_thread::sleep_for(10ms);
-		//		}
-		//	}
-		//);
     }
 	return;
 }

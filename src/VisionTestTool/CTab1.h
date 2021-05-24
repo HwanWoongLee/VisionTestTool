@@ -27,6 +27,7 @@ protected:
 
 private:
 	BOOL m_bFirst = FALSE;
+
 	CComboBox m_comboMorph;
 	CComboBox m_comboThreshold;
 
@@ -65,9 +66,7 @@ private:
 	void TestCode3();
 	void TestCode4(cv::Mat& image);
 	void TestCode5(cv::Mat& image);
-
 	void TestROI(cv::Mat& image, cv::Mat mark, cv::Rect& roiRect);
-
 
 
 	std::vector<cv::Point> m_test4Pts;

@@ -12,10 +12,9 @@ class CTab2 : public CTab1
 	DECLARE_DYNAMIC(CTab2)
 
 public:
-	CTab2(CWnd* pParent = nullptr);   // 표준 생성자입니다.
+	CTab2(CWnd* pParent = nullptr); 
 	virtual ~CTab2();
 
-// 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG2 };
 #endif
@@ -23,7 +22,6 @@ protected:
 	CVisionTestToolDlg*		m_pParent = nullptr;
 	LUTManipulator*			m_pLUT = nullptr;
 
-	//std::thread*			m_pThreadLUT = nullptr;
 
 private:
 	CMatView	m_markView;
@@ -58,7 +56,6 @@ public:
 	afx_msg void OnBnClickedBtnRansacCircle();
 	afx_msg void OnBnClickedBtnRansacEllipse();
 	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
-
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg void OnEnChangeEditRotate();
 	afx_msg void OnBnClickedBtnResize();

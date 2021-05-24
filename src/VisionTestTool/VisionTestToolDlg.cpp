@@ -6,7 +6,6 @@
 #include "CTab1.h"
 #include "CTab2.h"
 #include "ImageProcess.h"
-// #include "LUTManipulator.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -23,28 +22,28 @@ void CVisionTestToolDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_TAB1, m_Tab);
-	DDX_Control(pDX, IDC_CHECK_GET_VIEW_IMAGE, m_checkBoxGetViewImage);
-	DDX_Control(pDX, IDC_EDIT_CLIP_LIMIT, m_editClipLimit);
-	DDX_Control(pDX, IDC_EDIT_TILE_SIZE, m_editTileSize);
-	DDX_Control(pDX, IDC_EDIT_GAMMA_VALUE, m_editGammaValue);
-	DDX_Control(pDX, IDC_SLIDER_GAMMA_VALUE, m_sliderGamma);
+	DDX_Control(pDX, IDC_CHECK_GET_VIEW_IMAGE,	m_checkBoxGetViewImage);
+	DDX_Control(pDX, IDC_EDIT_CLIP_LIMIT,		m_editClipLimit);
+	DDX_Control(pDX, IDC_EDIT_TILE_SIZE,		m_editTileSize);
+	DDX_Control(pDX, IDC_EDIT_GAMMA_VALUE,		m_editGammaValue);
+	DDX_Control(pDX, IDC_SLIDER_GAMMA_VALUE,	m_sliderGamma);
 }
 
 BEGIN_MESSAGE_MAP(CVisionTestToolDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB1, &CVisionTestToolDlg::OnTcnSelchangeTab1)
-	ON_BN_CLICKED(IDC_BTN_SHOW_IMAGE, &CVisionTestToolDlg::OnBnClickedBtnShowImage)
-	ON_BN_CLICKED(IDC_BTN_HIST_EQUALIZATION, &CVisionTestToolDlg::OnBnClickedBtnHistEqualization)
-	ON_BN_CLICKED(IDC_BTN_HIST_STRETCH, &CVisionTestToolDlg::OnBnClickedBtnHistStretch)
-	ON_BN_CLICKED(IDC_BTN_WHITE_BALANCE, &CVisionTestToolDlg::OnBnClickedBtnWhiteBalance)
-	ON_BN_CLICKED(IDC_BTN_CLAHE, &CVisionTestToolDlg::OnBnClickedBtnClahe)
-	ON_BN_CLICKED(IDC_BTN_BGR, &CVisionTestToolDlg::OnBnClickedBtnBgr)
-	ON_BN_CLICKED(IDC_BTN_HSV, &CVisionTestToolDlg::OnBnClickedBtnHsv)
-	ON_BN_CLICKED(IDC_BTN_BAYERTOGRAY, &CVisionTestToolDlg::OnBnClickedBtnBayertogray)
-	ON_BN_CLICKED(IDC_BTN_GAMMA_CORRECTION, &CVisionTestToolDlg::OnBnClickedBtnGammaCorrection)
+	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB1,			&CVisionTestToolDlg::OnTcnSelchangeTab1)
+	ON_BN_CLICKED(IDC_BTN_SHOW_IMAGE,			&CVisionTestToolDlg::OnBnClickedBtnShowImage)
+	ON_BN_CLICKED(IDC_BTN_HIST_EQUALIZATION,	&CVisionTestToolDlg::OnBnClickedBtnHistEqualization)
+	ON_BN_CLICKED(IDC_BTN_HIST_STRETCH,			&CVisionTestToolDlg::OnBnClickedBtnHistStretch)
+	ON_BN_CLICKED(IDC_BTN_WHITE_BALANCE,		&CVisionTestToolDlg::OnBnClickedBtnWhiteBalance)
+	ON_BN_CLICKED(IDC_BTN_CLAHE,				&CVisionTestToolDlg::OnBnClickedBtnClahe)
+	ON_BN_CLICKED(IDC_BTN_BGR,					&CVisionTestToolDlg::OnBnClickedBtnBgr)
+	ON_BN_CLICKED(IDC_BTN_HSV,					&CVisionTestToolDlg::OnBnClickedBtnHsv)
+	ON_BN_CLICKED(IDC_BTN_BAYERTOGRAY,			&CVisionTestToolDlg::OnBnClickedBtnBayertogray)
+	ON_BN_CLICKED(IDC_BTN_GAMMA_CORRECTION,		&CVisionTestToolDlg::OnBnClickedBtnGammaCorrection)
+	ON_EN_CHANGE(IDC_EDIT_GAMMA_VALUE,			&CVisionTestToolDlg::OnEnChangeEditGammaValue)
 	ON_WM_HSCROLL()
-	ON_EN_CHANGE(IDC_EDIT_GAMMA_VALUE, &CVisionTestToolDlg::OnEnChangeEditGammaValue)
 END_MESSAGE_MAP()
 
 
@@ -75,9 +74,6 @@ BOOL CVisionTestToolDlg::OnInitDialog()
 	m_pTab2->Create(IDD_DIALOG2, &m_Tab);
 	m_pTab2->MoveWindow(0, 20, rect.Width(), rect.Height() - 20);
 	m_pTab2->ShowWindow(SW_HIDE);
-
-
-
 
 	// Create Camera window
 	m_pCamera = new CCameraPaneWnd();
@@ -130,7 +126,7 @@ BOOL CVisionTestToolDlg::OnInitDialog()
 	m_editTileSize.SetWindowTextW(_T("8"));
 	m_editGammaValue.SetWindowTextW(_T("0.5"));
 
-	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
+	return TRUE;
 }
 
 
@@ -138,11 +134,10 @@ void CVisionTestToolDlg::OnPaint()
 {
 	if (IsIconic())
 	{
-		CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
+		CPaintDC dc(this);
 
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
-		// 클라이언트 사각형에서 아이콘을 가운데에 맞춥니다.
 		int cxIcon = GetSystemMetrics(SM_CXICON);
 		int cyIcon = GetSystemMetrics(SM_CYICON);
 		CRect rect;
@@ -150,7 +145,6 @@ void CVisionTestToolDlg::OnPaint()
 		int x = (rect.Width() - cxIcon + 1) / 2;
 		int y = (rect.Height() - cyIcon + 1) / 2;
 
-		// 아이콘을 그립니다.
 		dc.DrawIcon(x, y, m_hIcon);
 	}
 	else
@@ -213,8 +207,6 @@ void CVisionTestToolDlg::CalcHist(cv::Mat image) {
 	int iWidth = 1024;
 	cv::Mat histImage(400, iWidth, CV_8UC3, cv::Scalar(0, 0, 0));
 
-	//cv::cvtColor(image, image, cv::COLOR_BGR2GRAY);
-
 	if (image.channels() == 3) {
 		std::vector<cv::Mat> bgr_planes;
 		split(image, bgr_planes);
@@ -273,12 +265,7 @@ void CVisionTestToolDlg::OnBnClickedBtnShowImage()
 	cv::Mat image;
 	m_pCamera->GetCameraView()->GetImage(image);
 
-	// test
-	//cv::cvtColor(image, image, cv::COLOR_BGR2GRAY);
-	//cv::cvtColor(image, image, cv::COLOR_BayerBG2BGR);
-
 	SetResultImage(image);
-
 	return;
 }
 
@@ -446,7 +433,6 @@ void CVisionTestToolDlg::OnBnClickedBtnGammaCorrection()
 	return;
 }
 
-
 void CVisionTestToolDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	if (IDC_SLIDER_GAMMA_VALUE == pScrollBar->GetDlgCtrlID()) {
@@ -459,7 +445,6 @@ void CVisionTestToolDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollB
 
 	CDialogEx::OnHScroll(nSBCode, nPos, pScrollBar);
 }
-
 
 void CVisionTestToolDlg::OnEnChangeEditGammaValue()
 {

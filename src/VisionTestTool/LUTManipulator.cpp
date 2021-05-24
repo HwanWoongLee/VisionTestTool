@@ -72,6 +72,13 @@ void LUTManipulator::DrawGraph(CDC& pDC, double dWidth, double dHeight) {
 		for (int n = 0; n < nCount; ++n) {
 			fy += m_params[n] * pow(x, n);
 		}
+		if (fy < 0) {
+			fy = 0;
+		}
+		else if (fy > 255) {
+			fy = 255;
+		}
+
 		values.push_back(fy);
 	}
 
