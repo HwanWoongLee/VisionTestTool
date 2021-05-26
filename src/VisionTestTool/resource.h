@@ -7,6 +7,7 @@
 #define IDD_DIALOG1                     130
 #define IDD_DIALOG2                     132
 #define IDD_DIALOG_LUT                  137
+#define IDD_DIALOG3                     139
 #define IDC_TAB1                        1000
 #define IDC_STATIC_CAMERA_VIEW          1001
 #define IDC_STATIC_RESULT_VIEW          1002
@@ -92,16 +93,25 @@
 #define IDC_BTN_INIT_LUT                1050
 #define IDC_BTN_APPLY_LUT               1051
 #define IDC_STATIC_LUT_GRAPH_VIEW       1052
-#define IDC_CHECK1                      1053
 #define IDC_CHECK_APPLY_LUT             1053
+#define IDC_EDIT_MIL_GMF_PATH           1055
+#define IDC_BTN_MMF_LOAD                1056
+#define IDC_BTN_MODEL_FIND              1057
+#define IDC_EDIT_MIL_STR_PATH           1058
+#define IDC_BTN_MSR_LOAD                1059
+#define IDC_BTN_STRING_READ             1060
+#define IDC_EDIT_MIL_MCO_PATH           1061
+#define IDC_BTN_MCO_LOAD                1062
+#define IDC_BTN_STRING_READ2            1063
+#define IDC_BTN_CODE_READ               1063
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        139
+#define _APS_NEXT_RESOURCE_VALUE        141
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1054
+#define _APS_NEXT_CONTROL_VALUE         1058
 #define _APS_NEXT_SYMED_VALUE           105
 #endif
 #endif

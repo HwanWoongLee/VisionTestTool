@@ -5,6 +5,7 @@
 
 class CTab1;
 class CTab2;
+class CMILTab;
 class LUTManipulator;
 
 class CVisionTestToolDlg : public CDialogEx
@@ -34,6 +35,8 @@ private:
 	CTabCtrl		m_Tab;
 	CTab1*			m_pTab1;
 	CTab2*			m_pTab2;
+	CMILTab*		m_pTabMIL;
+
 	
 	CCameraPaneWnd* m_pCamera;
 	

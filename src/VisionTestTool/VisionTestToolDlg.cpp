@@ -5,6 +5,7 @@
 #include "afxdialogex.h"
 #include "CTab1.h"
 #include "CTab2.h"
+#include "CMILTab.h"
 #include "ImageProcess.h"
 
 #ifdef _DEBUG
@@ -59,6 +60,7 @@ BOOL CVisionTestToolDlg::OnInitDialog()
 	// Tab Control
 	m_Tab.InsertItem(0, _T("Tab1"));
 	m_Tab.InsertItem(1, _T("Tab2"));
+	m_Tab.InsertItem(2, _T("Matrox"));
 
 	m_Tab.SetCurSel(0);
 
@@ -74,6 +76,11 @@ BOOL CVisionTestToolDlg::OnInitDialog()
 	m_pTab2->Create(IDD_DIALOG2, &m_Tab);
 	m_pTab2->MoveWindow(0, 20, rect.Width(), rect.Height() - 20);
 	m_pTab2->ShowWindow(SW_HIDE);
+
+	m_pTabMIL = new CMILTab(this);
+	m_pTabMIL->Create(IDD_DIALOG3, &m_Tab);
+	m_pTabMIL->MoveWindow(0, 20, rect.Width(), rect.Height() - 20);
+	m_pTabMIL->ShowWindow(SW_HIDE);
 
 	// Create Camera window
 	m_pCamera = new CCameraPaneWnd();
@@ -168,13 +175,21 @@ void CVisionTestToolDlg::OnTcnSelchangeTab1(NMHDR* pNMHDR, LRESULT* pResult)
 		case 0: {
 			m_pTab1->ShowWindow(SW_SHOW);
 			m_pTab2->ShowWindow(SW_HIDE);
+			m_pTabMIL->ShowWindow(SW_HIDE);
 			break;
 		}
 		case 1: {
 			m_pTab1->ShowWindow(SW_HIDE);
 			m_pTab2->ShowWindow(SW_SHOW);
+			m_pTabMIL->ShowWindow(SW_HIDE);
 			break;
-		}
+        }
+		case 2: {
+			m_pTab1->ShowWindow(SW_HIDE);
+			m_pTab2->ShowWindow(SW_HIDE);
+			m_pTabMIL->ShowWindow(SW_SHOW);
+            break;
+        }
 	}
 	*pResult = 0;
 }
