@@ -336,7 +336,6 @@ void CVisionTestToolDlg::OnBnClickedBtnClahe()
 
 	cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE();
 	
-
 	CString str;
 	m_editClipLimit.GetWindowTextW(str);
 	double dClipLimit = _wtof(str);

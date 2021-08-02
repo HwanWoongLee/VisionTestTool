@@ -33,9 +33,9 @@
 #include "opencv2/xphoto/white_balance.hpp"
 
 #ifdef DEBUG
-#pragma comment(lib, "opencv_world450d.lib")
+#pragma comment(lib, "opencv_world452d.lib")
 #else
-#pragma comment(lib, "opencv_world450.lib")
+#pragma comment(lib, "opencv_world452.lib")
 #endif
 
 // Mocha

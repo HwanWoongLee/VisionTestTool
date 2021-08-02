@@ -4,6 +4,8 @@
 // CTab1 대화 상자
 class CVisionTestToolDlg;
 class CImageProcess;
+class CMILModule;
+
 class CTab1 : public CDialogEx
 {
 	DECLARE_DYNAMIC(CTab1)
@@ -61,17 +63,14 @@ private:
 	int m_radioSobel;
 
 private:
-	void TestCode();
-	void TestCode2();
-	void TestCode3();
-	void TestCode4(cv::Mat& image);
-	void TestCode5(cv::Mat& image);
-	void TestROI(cv::Mat& image, cv::Mat mark, cv::Rect& roiRect);
+	// >> 점안액 TEST
+	CMILModule* m_pMIL = nullptr;
 
-
-	std::vector<cv::Point> m_test4Pts;
-	std::vector<cv::Point> m_test5Pts;
-
+	void SetMILContext();
+	bool GetMarkImage(const cv::Mat& image, cv::Mat& dst);
+	bool CheckBlack(const cv::Mat& image, cv::Mat& dst, int iThresh, int iMinSize = 0); // true:OK, false:NG
+	bool CheckLine(const cv::Mat& image, cv::Mat& dst, int iMin, int iMax);				// true:OK, false:NG
+	//<<
 
 private:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.

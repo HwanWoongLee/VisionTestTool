@@ -114,25 +114,48 @@ void CMILTab::OnBnClickedBtnMcoLoad()
 
 void CMILTab::OnBnClickedBtnModelFind()
 {
-	cv::Mat image = GetImage();
-	if (image.empty())
-		return;
+	for (int num = 0; num < 20; ++num) {
+		//cv::Mat image = GetImage();
+		auto sss = cv::format("C:/Users/PC/Desktop/성형불량/ok/%d.bmp", num + 1);
+		cv::Mat image = imread(sss);
+		if (image.empty())
+			return;
 
-	cv::Mat dst = image.clone();
-	if (image.channels() == 3)
-		cvtColor(image, image, cv::COLOR_BGR2GRAY);
+		cv::Mat dst = image.clone();
+		if (image.channels() == 3)
+			cvtColor(image, image, cv::COLOR_BGR2GRAY);
 
-	vector<double> angle, score;
-	vector<cv::Point2d> pts;
+		// test >>>>>
+		cv::resize(image, image, cv::Size(image.cols / 2, image.rows / 2));
+		cv::resize(dst, dst, cv::Size(dst.cols / 2, dst.rows / 2));
+		cv::Mat mark_image = cv::imread("D:/Project/VisionTestTool/images/mark_image.png");
+		cv::Size mark_size = mark_image.size();
+		// <<<<<
 
-	if (m_pMIL->FindModel(image, pts, angle, score)) {
-		for (int i = 0; i < pts.size(); ++i) {
-			cv::drawMarker(dst, pts[i], cv::Scalar(0, 255, 0), 0, 50);
-			cv::putText(dst, cv::format("score : %.2lf", score[i]), pts[i], 0, 1, cv::Scalar(0, 255, 0));
-			cv::putText(dst, cv::format("angle : %.2lf", angle[i]), pts[i] + cv::Point2d(0, 30), 0, 1, cv::Scalar(0, 255, 0));
+		vector<double> angle, score;
+		vector<cv::Point2d> pts;
+
+		if (m_pMIL->FindModel(image, pts, angle, score)) {
+			for (int i = 0; i < pts.size(); ++i) {
+				cv::drawMarker(dst, pts[i], cv::Scalar(0, 255, 0), 0, 50);
+				cv::putText(dst, cv::format("score : %.2lf", score[i]), pts[i], 0, 1, cv::Scalar(0, 255, 0));
+				cv::putText(dst, cv::format("angle : %.2lf", angle[i]), pts[i] + cv::Point2d(0, 30), 0, 1, cv::Scalar(0, 255, 0));
+
+				cv::Mat M = cv::getRotationMatrix2D(pts[i], -angle[i], 1.0);
+				cv::Mat rotImage;
+				cv::warpAffine(image, rotImage, M, image.size());
+
+				cv::Mat save_image = rotImage(cv::Rect(pts[i].x - (mark_size.width / 2), pts[i].y - (mark_size.height / 2), mark_size.width, mark_size.height));
+				CTime time = CTime::GetCurrentTime();
+				int h = time.GetHour();
+				int m = time.GetMinute();
+				int s = time.GetSecond();
+				cv::imwrite(cv::format("../../temp/%d_%d_%d_%d.png", h, m, s, i), save_image);
+			}
+
+			SetImage(dst);
 		}
-
-		SetImage(dst);
+		waitKey(1000);
 	}
 	return;
 }
