@@ -58,6 +58,8 @@ void CTab2::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO_CONTOUR_MODE, m_comboContourMode);
 	DDX_Control(pDX, IDC_COMBO_CONTOUR_METHOD, m_comboContourMethod);
 	DDX_Control(pDX, IDC_CHECK_APPLY_LUT, m_checkLUT);
+	DDX_Control(pDX, IDC_EDIT_THRESH, m_editThresh);
+	DDX_Control(pDX, IDC_EDIT_DIST, m_editDist);
 }
 
 
@@ -76,6 +78,7 @@ BEGIN_MESSAGE_MAP(CTab2, CDialogEx)
 	ON_WM_HSCROLL()
 	ON_WM_SHOWWINDOW()
 	ON_WM_TIMER()
+	ON_BN_CLICKED(IDC_BTN_WATERSHED, &CTab2::OnBnClickedBtnWatershed)
 END_MESSAGE_MAP()
 
 
@@ -98,6 +101,9 @@ void CTab2::OnShowWindow(BOOL bShow, UINT nStatus)
 		m_editRotate.SetWindowTextW(_T("0"));
 		m_editResize.SetWindowTextW(_T("1.0"));
 
+		m_editThresh.SetWindowTextW(_T("100"));
+		m_editDist.SetWindowTextW(_T("0.1"));
+		
 		m_comboContourMode.AddString(_T("RETR_EXTERNAL"));				// 0 외부 윤곽만 검색
 		m_comboContourMode.AddString(_T("RETR_LIST"));					// 1 모든 윤관선 검색
 		m_comboContourMode.AddString(_T("RETR_CCOMP"));					// 2 두 수준의 계층 구조
@@ -372,6 +378,83 @@ void CTab2::OnBnClickedBtnContour()
 }
 
 
+void CTab2::OnBnClickedBtnWatershed()
+{
+	cv::Mat image = GetImage();
+	if (image.empty())
+		return;
+
+    cv::Mat gray = image.clone();
+    if (gray.channels() == 3)
+        cv::cvtColor(gray, gray, cv::COLOR_BGR2GRAY);
+
+	CString str;
+	m_editThresh.GetWindowTextW(str);
+	int iThreshold = _ttoi(str);
+	
+	m_editDist.GetWindowTextW(str);
+	double dDistThresh = _ttof(str);
+
+	cv::Mat dist;
+    cv::threshold(gray, dist, iThreshold, 255, THRESH_BINARY);
+    cv::distanceTransform(dist, dist, cv::DIST_L2, 3);
+
+    cv::normalize(dist, dist, 0, 1, cv::NORM_MINMAX);
+    cv::threshold(dist, dist, dDistThresh, 1.0, THRESH_BINARY);
+
+    cv::Mat kernel = cv::Mat::ones(3, 3, CV_8UC1);
+    cv::dilate(dist, dist, kernel);
+	dist.convertTo(dist, CV_8U);
+
+	int iMode = m_comboContourMode.GetCurSel(); // cv::RETR_LIST;
+	int iMethod = m_comboContourMethod.GetCurSel() + 1; //cv::CHAIN_APPROX_SIMPLE;
+
+	std::vector<std::vector<cv::Point>> contours;
+	cv::findContours(dist, contours, iMode, iMethod);
+
+	cv::Mat marker = cv::Mat::zeros(dist.size(), CV_32S);
+	for (int i = 0; i < contours.size(); ++i) {
+		cv::drawContours(marker, contours, i, Scalar(i + 1), -1);
+    }
+    circle(marker, Point(5, 5), 3, Scalar(255), -1);
+    circle(marker, Point(image.cols - 5, image.rows - 5), 3, Scalar(255), -1);
+    circle(marker, Point(image.cols - 5, 5), 3, Scalar(255), -1);
+    circle(marker, Point(5, image.rows - 5), 3, Scalar(255), -1);
+
+	if (image.channels() == 1)
+		cvtColor(image, image, cv::COLOR_GRAY2BGR);
+
+	cv::watershed(image, marker);
+
+	vector<Vec3b> colors;
+	for (size_t i = 0; i < contours.size(); i++)
+	{
+		int b = theRNG().uniform(0, 256);
+		int g = theRNG().uniform(0, 256);
+		int r = theRNG().uniform(0, 256);
+		colors.push_back(Vec3b((uchar)b, (uchar)g, (uchar)r));
+	}
+
+	cv::Mat dst = cv::Mat::zeros(marker.size(), CV_8UC3);
+	for (int i = 0; i < marker.rows; i++)
+	{
+		for (int j = 0; j < marker.cols; j++)
+		{
+			int index = marker.at<int>(i, j);
+			RNG rng(12345);
+
+			if (index > 0 && index <= static_cast<int>(contours.size()))
+			{
+				dst.at<Vec3b>(i, j) = colors[index - 1];
+			}
+		}
+	}
+
+	SetImage(dst);
+	return;
+}
+
+
 void CTab2::OnBnClickedBtnConvexHull()
 {
 	cv::Mat image = GetImage();
@@ -482,3 +565,4 @@ void CTab2::OnTimer(UINT_PTR nIDEvent)
 	}
 	CTab1::OnTimer(nIDEvent);
 }
+

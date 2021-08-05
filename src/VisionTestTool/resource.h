@@ -85,6 +85,7 @@
 #define IDC_EDIT_DENOISE_H              1045
 #define IDC_BTN_CONVEX_HULL             1045
 #define IDC_SLIDER_CANNY1               1046
+#define IDC_BTN_WATERSHED               1046
 #define IDC_SLIDER_CANNY2               1047
 #define IDC_BTN_MATCHING_LOAD_MARK      1047
 #define IDC_STATIC_MATCHING_MARK        1048
@@ -94,7 +95,10 @@
 #define IDC_BTN_APPLY_LUT               1051
 #define IDC_STATIC_LUT_GRAPH_VIEW       1052
 #define IDC_CHECK_APPLY_LUT             1053
+#define IDC_EDIT_THRESH                 1054
 #define IDC_EDIT_MIL_GMF_PATH           1055
+#define IDC_EDIT_RESIZE3                1055
+#define IDC_EDIT_DIST                   1055
 #define IDC_BTN_MMF_LOAD                1056
 #define IDC_BTN_MODEL_FIND              1057
 #define IDC_EDIT_MIL_STR_PATH           1058

@@ -33,6 +33,8 @@ private:
 	CEdit		m_editRansacSize;
 	CEdit		m_editResize;
 	CEdit		m_editRotate;
+	CEdit		m_editThresh;
+	CEdit		m_editDist;
 
 	CSliderCtrl m_sliderRotate;
 
@@ -66,4 +68,6 @@ public:
 	afx_msg void OnBnClickedBtnInitLut();
 	afx_msg void OnBnClickedBtnApplyLut();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnBnClickedBtnWatershed();
+
 };
