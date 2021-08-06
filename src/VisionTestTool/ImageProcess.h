@@ -15,8 +15,6 @@ enum eLINE_POSITION {
 
 class CImageProcess {
 protected:
-	ICameraView* m_pView = NULL;
-
 	enum {
 		TOP_LEFT = 0,
 		TOP_RIGHT,

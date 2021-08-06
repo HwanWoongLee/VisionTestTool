@@ -38,11 +38,11 @@ private:
 	CMILTab*		m_pTabMIL;
 
 	
-	CCameraPaneWnd* m_pCamera;
+	CTMatView*		m_pCamera;
 	
-	CMatView		m_resultView;
-	CMatView		m_histogramView;
-	CMatView		m_gammaGraphView;
+	CTMatView		m_resultView;
+	CTMatView		m_histogramView;
+	CTMatView		m_gammaGraphView;
 
 	CButton			m_checkBoxGetViewImage;
 	

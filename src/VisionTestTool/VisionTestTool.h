@@ -26,10 +26,8 @@ public:
 
 // 구현입니다.
 private:
-	CProfile m_profileVision;
 
 	DECLARE_MESSAGE_MAP()
 };
 
 extern CVisionTestToolApp theApp;
-extern CIPClient g_ipClient;

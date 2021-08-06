@@ -121,7 +121,7 @@ void CTab2::OnShowWindow(BOOL bShow, UINT nStatus)
 		if (!m_markView.Create(NULL, NULL, WS_VISIBLE | WS_CHILD | WS_BORDER, CRect(), this, IDC_STATIC_MATCHING_MARK)) {
 			return;
 		}
-
+		m_markView.ShowTool(false);
 		auto pWnd = GetDlgItem(IDC_STATIC_MATCHING_MARK);
 		CRect rect;
 		if (pWnd) {
@@ -288,7 +288,7 @@ void CTab2::OnBnClickedBtnRansacEllipse()
 		if (dst.channels() == 1)
 			cv::cvtColor(dst, dst, cv::COLOR_GRAY2BGR);
 		
-		cv::ellipse(dst, cv::Point(ellipse[0], ellipse[1]), cv::Size(ellipse[2], ellipse[3]), ellipse[4] * 180.0 / _M_PI, 0, 360, cv::Scalar(0, 0, 255), 2);
+		cv::ellipse(dst, cv::Point(ellipse[0], ellipse[1]), cv::Size(ellipse[2], ellipse[3]), ellipse[4] * 180.0 / CV_PI, 0, 360, cv::Scalar(0, 0, 255), 2);
 		SetImage(dst);
 	}
 	return;
@@ -301,7 +301,9 @@ void CTab2::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 		if (pScrollBar == (CScrollBar*)&m_sliderRotate)
 		{
 			int iPos = m_sliderRotate.GetPos();
-			m_editRotate.SetWindowTextW(Format(_T("%d"), iPos));
+			CString str;
+			str.Format(_T("%d"), iPos);
+			m_editRotate.SetWindowTextW(str);
 
 			cv::Mat image = m_pParent->GetShowImage();
             if (!image.empty()) {
@@ -499,7 +501,7 @@ void CTab2::OnBnClickedBtnMatchingLoadMark()
 		CString pathName = dlg.GetPathName();
 		m_markImage = cv::imread(std::string(CT2CA(pathName)));
 		if (!m_markImage.empty()) {
-			m_markView.SetImage(m_markImage, 0.0);
+			m_markView.SetImage(m_markImage);
 		}
 	}
 	return;

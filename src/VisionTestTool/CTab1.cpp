@@ -26,7 +26,9 @@ CTab1::CTab1(CWnd* pParent /*=nullptr*/)
 
 CTab1::~CTab1()
 {
-	SAFE_DELETE(m_pImageProcess);
+	if(m_pImageProcess)
+		delete m_pImageProcess;
+
 	m_pImageProcess = nullptr;
 }
 
@@ -441,7 +443,7 @@ void CTab1::OnBnClickedBtnHoughLine()
 	int iThreshold = _ttoi(str);
 
 	std::vector<cv::Vec2f> lines;
-	cv::HoughLines(image, lines, 1, M_PI / 180, iThreshold);
+	cv::HoughLines(image, lines, 1, CV_PI / 180, iThreshold);
 
 	if (dst.channels() == 1)
 		cv::cvtColor(dst, dst, cv::COLOR_GRAY2BGR);
@@ -665,11 +667,15 @@ void CTab1::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 		int iPos;
 		if (pScrollBar == (CScrollBar*)&m_sliderCanny1) {
 			iPos = m_sliderCanny1.GetPos();
-			m_editCanny1.SetWindowTextW(Format(_T("%d"), iPos));
+			CString str;
+			str.Format(_T("%d"), iPos);
+			m_editCanny1.SetWindowTextW(str);
 		}
 		else if (pScrollBar == (CScrollBar*)&m_sliderCanny2) {
 			iPos = m_sliderCanny2.GetPos();
-			m_editCanny2.SetWindowTextW(Format(_T("%d"), iPos));
+			CString str;
+			str.Format(_T("%d"), iPos);
+			m_editCanny2.SetWindowTextW(str);
 		}
 		cv::Mat image = GetImage();
 

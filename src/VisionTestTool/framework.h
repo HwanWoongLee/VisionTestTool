@@ -38,11 +38,11 @@
 #pragma comment(lib, "opencv_world452.lib")
 #endif
 
-// Mocha
-#include "opencv2/opencv.hpp"
-#include "FrameGrabber/FrameGrabber.h"
-#include "FrameGrabber/CameraPaneWnd.h"
-#include "xMathUtil/MatView.h"
+
+#include "TMatView.h"
+
+#define CONV_A(x) std::string(CT2CA(x))
+
 
 
 

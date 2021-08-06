@@ -24,7 +24,7 @@ protected:
 
 
 private:
-	CMatView	m_markView;
+	CTMatView	m_markView;
 	cv::Mat		m_markImage;
 
 	BOOL		m_bFirst = FALSE;

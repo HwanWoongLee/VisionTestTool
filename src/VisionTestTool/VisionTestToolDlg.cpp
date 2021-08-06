@@ -83,24 +83,17 @@ BOOL CVisionTestToolDlg::OnInitDialog()
 	m_pTabMIL->ShowWindow(SW_HIDE);
 
 	// Create Camera window
-	m_pCamera = new CCameraPaneWnd();
+	m_pCamera = new CTMatView();
 	if (!m_pCamera->Create(NULL, NULL, WS_VISIBLE | WS_CHILD | WS_BORDER, CRect(), this, IDC_CAMERA_WND)) {
 		return FALSE;
-	}
-	CCameraLayoutItem layout;
-	layout.Load(g_ipClient.GetAbsPath(_T("D:/Project/VisionTestTool/cfg/Vision_dummy.camLayout")));
-	if (layout.m_child.N() == 1) {
-		m_pCamera->InitPane(&layout.m_child[0]);
-	}
-	else {
-		m_pCamera->InitPane(&layout);
 	}
 
 	CWnd* pWnd = GetDlgItem(IDC_STATIC_CAMERA_VIEW);
 	pWnd->GetWindowRect(&rect);
 	ScreenToClient(rect);
+	
 	m_pCamera->MoveWindow(rect);
-
+	
 	if (!m_resultView.Create(NULL, NULL, WS_VISIBLE | WS_CHILD | WS_BORDER, CRect(), this, IDC_RESULT_VIEW_WND)) {
 		return FALSE;
 	}
@@ -199,13 +192,13 @@ cv::Mat CVisionTestToolDlg::GetImage() {
 	if (m_checkBoxGetViewImage.GetCheck())
 		m_resultView.GetImage(image);
 	else
-		m_pCamera->GetCameraView()->GetImage(image);
+		m_pCamera->GetImage(image);
 
 	return image;
 }
 
 void CVisionTestToolDlg::SetResultImage(cv::Mat image, BOOL bRedraw) {
-	m_resultView.SetImage(image, 0.0);
+	m_resultView.SetImage(image);
 	CalcHist(image);
 
     if (bRedraw)
@@ -278,7 +271,7 @@ void CVisionTestToolDlg::CalcHist(cv::Mat image) {
 void CVisionTestToolDlg::OnBnClickedBtnShowImage()
 {
 	cv::Mat image;
-	m_pCamera->GetCameraView()->GetImage(image);
+	m_pCamera->GetImage(image);
 
 	SetResultImage(image);
 	return;
@@ -439,7 +432,7 @@ void CVisionTestToolDlg::OnBnClickedBtnGammaCorrection()
 		graph.at<uchar>(cv::Point(i, 255 - lut_data[i * 3 + 0])) = 255;
 	}
 
-	m_gammaGraphView.SetImage(graph, 0.0);
+	m_gammaGraphView.SetImage(graph);
 	cv::Mat dst;
 	cv::LUT(image, lut, dst);
 
@@ -452,7 +445,8 @@ void CVisionTestToolDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollB
 	if (IDC_SLIDER_GAMMA_VALUE == pScrollBar->GetDlgCtrlID()) {
 		double dPos = m_sliderGamma.GetPos();
 
-		CString str = Format(_T("%.1lf"), dPos * 0.1);
+		CString str;
+		str.Format(_T("%.1lf"), dPos * 0.1);
 		m_editGammaValue.SetWindowTextW(str);
 		OnBnClickedBtnGammaCorrection();
 	}

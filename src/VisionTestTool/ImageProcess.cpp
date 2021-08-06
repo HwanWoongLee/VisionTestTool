@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 
 #include "ImageProcess.h"
-#include "ImageProcessor/ImageProcessor.h"
+
 
 
 //CImageProcess::CImageProcess(ICameraView* pView, CIPClient* pIPClient, LPCSTR pszUnitName) : m_pView(pView) {

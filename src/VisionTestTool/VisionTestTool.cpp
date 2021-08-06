@@ -34,7 +34,7 @@ CVisionTestToolApp::CVisionTestToolApp()
 // 유일한 CVisionTestToolApp 개체입니다.
 
 CVisionTestToolApp theApp;
-CIPClient g_ipClient;
+
 
 // CVisionTestToolApp 초기화
 
@@ -51,15 +51,7 @@ BOOL CVisionTestToolApp::InitInstance()
 	InitCommonControlsEx(&InitCtrls);
 
 	CWinApp::InitInstance();
-	
-	if (!g_ipClient.Init()) {
-		return FALSE;
-	}
-	m_profileVision.Load(g_ipClient.GetAbsPath(_T("..\\cfg\\Vision.ini")));
-	if (!InitVision(&g_ipClient, &m_profileVision, &g_ipClient.m_log)) {
-		AfxMessageBox(_T("Vision init fail."));
-		return FALSE;
-	}
+
 
 	AfxEnableControlContainer();
 

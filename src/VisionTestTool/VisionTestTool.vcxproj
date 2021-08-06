@@ -117,12 +117,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\Program Files\Matrox Imaging\MIL\Include;D:\Project\VisionTestTool\include;D:\QRS\Mocha\include;C:\OpenCV\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./;C:\Program Files\Matrox Imaging\MIL\Include;D:\Project\VisionTestTool\include;C:\OpenCV\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>C:\Program Files\Matrox Imaging\MIL\LIB;C:\OpenCV\lib\opencv.lib64;D:\QRS\Mocha\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files\Matrox Imaging\MIL\LIB;C:\OpenCV\lib\opencv.lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Midl>
@@ -171,14 +171,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\Program Files\Matrox Imaging\MIL\Include;D:\Project\VisionTestTool\include;D:\QRS\Mocha\include;C:\OpenCV\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./;C:\Program Files\Matrox Imaging\MIL\Include;D:\Project\VisionTestTool\include;C:\OpenCV\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\Program Files\Matrox Imaging\MIL\LIB;C:\OpenCV\lib\opencv.lib64;D:\QRS\Mocha\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files\Matrox Imaging\MIL\LIB;C:\OpenCV\lib\opencv.lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Midl>
@@ -194,6 +194,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\MILModule.h" />
+    <ClInclude Include="..\..\include\TMatView.h" />
+    <ClInclude Include="..\..\include\TViewer.h" />
     <ClInclude Include="CMILTab.h" />
     <ClInclude Include="CTab1.h" />
     <ClInclude Include="CTab2.h" />
@@ -211,6 +213,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\include\TMatView.cpp" />
+    <ClCompile Include="..\..\include\TViewer.cpp" />
     <ClCompile Include="CMILTab.cpp" />
     <ClCompile Include="CTab1.cpp" />
     <ClCompile Include="CTab2.cpp" />
