@@ -63,14 +63,14 @@ private:
 	int m_radioSobel;
 
 private:
-	// >> 점안액 TEST
-	CMILModule* m_pMIL = nullptr;
-
-	void SetMILContext();
-	bool GetMarkImage(const cv::Mat& image, cv::Mat& dst);
-	bool CheckBlack(const cv::Mat& image, cv::Mat& dst, int iThresh, int iMinSize = 0); // true:OK, false:NG
-	bool CheckLine(const cv::Mat& image, cv::Mat& dst, int iMin, int iMax);				// true:OK, false:NG
-	//<<
+	//// >> 점안액 TEST
+	//CMILModule* m_pMIL = nullptr;
+	//
+	//void SetMILContext();
+	//bool GetMarkImage(const cv::Mat& image, cv::Mat& dst);
+	//bool CheckBlack(const cv::Mat& image, cv::Mat& dst, int iThresh, int iMinSize = 0); // true:OK, false:NG
+	//bool CheckLine(const cv::Mat& image, cv::Mat& dst, int iMin, int iMax);				// true:OK, false:NG
+	////<<
 
 private:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.

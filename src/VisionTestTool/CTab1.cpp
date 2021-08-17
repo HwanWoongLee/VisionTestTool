@@ -278,19 +278,17 @@ void CTab1::OnBnClickedBtnThreshold()
 	int iThresh2 = _ttoi(str);
 
 	int iThreshType = m_comboThreshold.GetCurSel();
+
+	if (image.channels() == 3)
+		cv::cvtColor(image, image, cv::COLOR_BGR2GRAY);
+
 	if (iThreshType == 5) {
 		iThreshType = 7;
 	}
 	else if (iThreshType == 6) {
-		if (image.channels() == 3)
-			cv::cvtColor(image, image, cv::COLOR_BGR2GRAY);
-
 		iThreshType = 8;
 	}
 	else if (iThreshType == 7) {
-		if (image.channels() == 3)
-			cv::cvtColor(image, image, cv::COLOR_BGR2GRAY);
-
 		iThreshType = 16;
 	}
 
@@ -507,157 +505,207 @@ cv::Point2d rotatePoint(const cv::Point2d& inPoint, const cv::Point2d& center, c
 #define MARK_WIDTH 380
 #define MARK_HEIGHT 280
 
-void CTab1::SetMILContext() {
-	if (!m_pMIL) {
-		m_pMIL = new CMILModule();
-		m_pMIL->SetModelFinderContext("D:/Project/VisionTestTool/cfg/model_finder.mmf");
-	}
-}
-bool CTab1::GetMarkImage(const cv::Mat& image, cv::Mat& dst) {
-	cv::Mat resize;
-	cv::resize(image, resize, cv::Size(image.cols * 0.5, image.rows * 0.5));
+//void CTab1::SetMILContext() {
+//    if (!m_pMIL) {
+//        m_pMIL = new CMILModule();
+//        m_pMIL->SetModelFinderContext("D:/Project/VisionTestTool/cfg/model_finder.mmf");
+//    }
+//}
+//bool CTab1::GetMarkImage(const cv::Mat& image, cv::Mat& dst) {
+//    cv::Mat resize;
+//    cv::resize(image, resize, cv::Size(image.cols * 0.5, image.rows * 0.5));
+//
+//    //cv::Rect roiRect = cv::Rect(600, 1500, 1300, 800);
+//    cv::Rect roiRect = cv::Rect(600, 1200, 1300, 800) & cv::Rect(0, 0, resize.cols, resize.rows);
+//    cv::Mat roiImage = resize(roiRect);
+//    if (roiImage.channels() == 3)
+//        cv::cvtColor(roiImage, roiImage, cv::COLOR_BGR2GRAY);
+//
+//    vector<Point2d> pts;
+//    vector<double> angles;
+//    vector<double> scores;
+//
+//    if (m_pMIL->FindModel(roiImage, pts, angles, scores)) {
+//        cv::Mat R = cv::getRotationMatrix2D(pts[0], -angles[0], 1.0);
+//
+//        cv::Mat rotImage;
+//        cv::warpAffine(roiImage, rotImage, R, roiImage.size());
+//
+//        cv::Rect rect = cv::Rect(pts[0].x - MARK_WIDTH, pts[0].y - MARK_HEIGHT - 100, MARK_WIDTH * 2, MARK_HEIGHT * 2) & cv::Rect(0, 0, rotImage.cols, rotImage.rows);
+//        rotImage = rotImage(rect);
+//        dst = rotImage.clone();
+//
+//        return true;
+//    }
+//    return false;
+//}
+//bool CTab1::CheckBlack(const cv::Mat& image, cv::Mat& dst, int iThresh, int iMinSize) {
+//	cv::threshold(image, dst, iThresh, 255, cv::THRESH_BINARY_INV);
+//
+//	vector<vector<cv::Point>> contours;
+//	findContours(dst, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE, Point(0, 0));
+//
+//    if (contours.size() < 1)
+//        return true;
+//
+//	cv::Mat resultImage = cv::Mat::zeros(image.size(), CV_8UC1);
+//
+//	for (int i = 0; i < contours.size(); ++i) {
+//		if (contours[i].size() > iMinSize) {
+//			cv::drawContours(resultImage, contours, i, cv::Scalar(255), -1);
+//		}
+//	}
+//
+//	dst = resultImage.clone();
+//	return false;
+//}
+//bool CTab1::CheckLine(const cv::Mat& image, cv::Mat& dst, int iMin, int iMax) {
+//	cv::Mat resultImage = cv::Mat::zeros(image.size(), CV_8UC3);
+//
+//	double dWidth = image.cols / 5;
+//
+//	cv::Mat temp, temp2;
+//	cv::Rect roiRect = cv::Rect(0, 340, dWidth, 100);
+//	bool bResult = true;
+//
+//	for (int i = 0; i < 5; ++i) {
+//		temp = image(cv::Rect(dWidth * i, 0, dWidth, image.rows)).clone();
+//		temp2 = temp(roiRect);
+//
+//		cv::threshold(temp2, temp2, 220, 255, cv::THRESH_BINARY);
+//		cv::GaussianBlur(temp2, temp2, cv::Size(3, 3), 0);
+//		cv::Canny(temp2, temp2, 50, 100);
+//		
+//		cv::Point2d pt1, pt2;
+//		if (m_pImageProcess->GetLine_parallel(temp2, cv::Rect(0, 0, temp2.cols, temp2.rows), 0, 0, 3, 100, eLINE_POSITION::BOTTOM_LINE, pt1, pt2, FALSE, FALSE)) {
+//			double dHeight = (pt1.y + pt2.y) * 0.5;
+//			cv::Scalar color;
+//			if (dHeight > iMin && dHeight < iMax) {
+//				color = cv::Scalar(0, 255, 0);
+//			}
+//			else {
+//				color = cv::Scalar(0, 0, 255);
+//				bResult = false;
+//			}
+//
+//			cv::line(resultImage,
+//				roiRect.tl() + cv::Point(dWidth * i, dHeight),
+//				roiRect.tl() + cv::Point(dWidth * (i + 1), dHeight),
+//				color, 1);
+//		}
+//		else {
+//			bResult = false;
+//		}
+//	}
+//
+//	dst = resultImage.clone();
+//	return bResult;
+//}
+//
+//bool m_bBlack	= true;
+//bool m_bLine	= true;
+//
+//void CTab1::OnBnClickedBtnTest()
+//{
+//	SetMILContext();
+//
+//	auto sTime = GetTickCount64();
+//
+//	cv::Mat image = GetImage();
+//	cv::Mat markImage, resultImage;
+//	if (GetMarkImage(image, markImage)) {
+//		cv::Mat blackImage, lineImage;
+//		vector<Point> pts;
+//
+//		resultImage = markImage.clone();
+//		if (resultImage.channels() == 1)
+//			cvtColor(resultImage, resultImage, cv::COLOR_GRAY2BGR);
+//
+//		m_bBlack	= CheckBlack(markImage, blackImage, 100);
+//		m_bLine		= CheckLine(markImage, lineImage, 40, 70);
+//
+//		if (!m_bBlack) {
+//			cv::findNonZero(blackImage, pts);
+//
+//			for each (Point pt in pts) {
+//				resultImage.at<Vec3b>(pt)[0] = 0;
+//				resultImage.at<Vec3b>(pt)[1] = 0;
+//				resultImage.at<Vec3b>(pt)[2] = 255;
+//			}
+//			cv::putText(resultImage, "Carbide NG", cv::Point(50, 100), 0, 1, cv::Scalar(0, 0, 255));
+//		}
+//		if (!m_bLine) {
+//			cv::putText(resultImage, "Height NG", cv::Point(50, 150), 0, 1, cv::Scalar(0, 0, 255));
+//		}
+//		for (int y = 0; y < lineImage.rows; ++y) {
+//			auto data = lineImage.ptr<uchar>(y);
+//			for (int x = 0; x < lineImage.cols; ++x) {
+//				if (data[x * 3 + 0] != 0 || data[x * 3 + 1] != 0 || data[x * 3 + 2] != 0) {
+//					resultImage.at<Vec3b>(y, x)[0] = data[x * 3 + 0];
+//					resultImage.at<Vec3b>(y, x)[1] = data[x * 3 + 1];
+//					resultImage.at<Vec3b>(y, x)[2] = data[x * 3 + 2];
+//				}
+//			}
+//		}
+//
+//		double dTime = (GetTickCount64() - sTime) * 0.001;
+//		cv::putText(resultImage, cv::format("time : %.2lf (sec)", dTime), cv::Point(50, 50), 0, 1, cv::Scalar(255, 0, 0));
+//		SetImage(resultImage);
+//	}
+//	else {
+//		MessageBox(_T("Mark 찾기 실패"));
+//	}
+//
+//	return;
+//}
 
-	//cv::Rect roiRect = cv::Rect(600, 1500, 1300, 800);
-	cv::Rect roiRect = cv::Rect(600, 1200, 1300, 800) & cv::Rect(0, 0, resize.cols, resize.rows);
-	cv::Mat roiImage = resize(roiRect);
-	if (roiImage.channels() == 3)
-		cv::cvtColor(roiImage, roiImage, cv::COLOR_BGR2GRAY);
+void CTab1::OnBnClickedBtnTest() {
+	cv::Mat image = GetImage();
+	cv::Mat gray;
 
-	vector<Point2d> pts;
-	vector<double> angles;
-	vector<double> scores;
+	if (image.channels() == 3)
+		cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+	else
+		gray = image.clone();
 
-	if (m_pMIL->FindModel(roiImage, pts, angles, scores)) {
-		cv::Mat R = cv::getRotationMatrix2D(pts[0], -angles[0], 1.0);
+	int iThresh = 100;
+	int iLength = 40;
 
-		cv::Mat rotImage;
-		cv::warpAffine(roiImage, rotImage, R, roiImage.size());
+	cv::threshold(gray, gray, 100, 255, cv::THRESH_BINARY_INV);
 
-		cv::Rect rect = cv::Rect(pts[0].x - MARK_WIDTH, pts[0].y - MARK_HEIGHT - 100, MARK_WIDTH * 2, MARK_HEIGHT * 2) & cv::Rect(0, 0, rotImage.cols, rotImage.rows);
-		rotImage = rotImage(rect);
-		dst = rotImage.clone();
-
-		return true;
-	}
-	return false;
-}
-bool CTab1::CheckBlack(const cv::Mat& image, cv::Mat& dst, int iThresh, int iMinSize) {
-	cv::threshold(image, dst, iThresh, 255, cv::THRESH_BINARY_INV);
-
-	vector<vector<cv::Point>> contours;
-	findContours(dst, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE, Point(0, 0));
-
-    if (contours.size() < 1)
-        return true;
-
-	cv::Mat resultImage = cv::Mat::zeros(image.size(), CV_8UC1);
+	vector<vector<Point>> contours;
+	cv::findContours(gray, contours, cv::RETR_LIST, cv::CHAIN_APPROX_NONE);
 
 	for (int i = 0; i < contours.size(); ++i) {
-		if (contours[i].size() > iMinSize) {
-			cv::drawContours(resultImage, contours, i, cv::Scalar(255), -1);
-		}
-	}
+		auto bbox = cv::minAreaRect(contours[i]);
+		float fHeight = bbox.size.height;
+		float fWidth = bbox.size.width;
 
-	dst = resultImage.clone();
-	return false;
-}
-bool CTab1::CheckLine(const cv::Mat& image, cv::Mat& dst, int iMin, int iMax) {
-	cv::Mat resultImage = cv::Mat::zeros(image.size(), CV_8UC3);
+		if (fHeight >= iLength || fWidth >= iLength) {
+			cv::Point2f pts[4];
+			bbox.points(pts);
+			cv::drawContours(image, contours, i, cv::Scalar(0, 0, 255), -1);
 
-	double dWidth = image.cols / 5;
+			double d1 = m_pImageProcess->GetDistancePointToPoint(pts[0], pts[1]);
+			double d2 = m_pImageProcess->GetDistancePointToPoint(pts[1], pts[2]);
 
-	cv::Mat temp, temp2;
-	cv::Rect roiRect = cv::Rect(0, 340, dWidth, 100);
-	bool bResult = true;
-
-	for (int i = 0; i < 5; ++i) {
-		temp = image(cv::Rect(dWidth * i, 0, dWidth, image.rows)).clone();
-		temp2 = temp(roiRect);
-
-		cv::threshold(temp2, temp2, 220, 255, cv::THRESH_BINARY);
-		cv::GaussianBlur(temp2, temp2, cv::Size(3, 3), 0);
-		cv::Canny(temp2, temp2, 50, 100);
-		
-		cv::Point2d pt1, pt2;
-		if (m_pImageProcess->GetLine_parallel(temp2, cv::Rect(0, 0, temp2.cols, temp2.rows), 0, 0, 3, 100, eLINE_POSITION::BOTTOM_LINE, pt1, pt2, FALSE, FALSE)) {
-			double dHeight = (pt1.y + pt2.y) * 0.5;
-			cv::Scalar color;
-			if (dHeight > iMin && dHeight < iMax) {
-				color = cv::Scalar(0, 255, 0);
+			if (d1 < d2) {
+				cv::line(image, pts[0], pts[1], cv::Scalar(0, 255, 0), 1);
+				cv::line(image, pts[2], pts[3], cv::Scalar(0, 255, 0), 1);
+				cv::line(image, cv::Point((pts[0] + pts[1]) / 2), cv::Point((pts[2] + pts[3]) / 2), cv::Scalar(0, 255, 0), 1);
 			}
 			else {
-				color = cv::Scalar(0, 0, 255);
-				bResult = false;
+				cv::line(image, pts[1], pts[2], cv::Scalar(0, 255, 0), 1);
+				cv::line(image, pts[3], pts[0], cv::Scalar(0, 255, 0), 1);
+				cv::line(image, cv::Point((pts[1] + pts[2]) / 2), cv::Point((pts[3] + pts[0]) / 2), cv::Scalar(0, 255, 0), 1);
 			}
 
-			cv::line(resultImage,
-				roiRect.tl() + cv::Point(dWidth * i, dHeight),
-				roiRect.tl() + cv::Point(dWidth * (i + 1), dHeight),
-				color, 1);
-		}
-		else {
-			bResult = false;
+			float fResult = fHeight > fWidth ? fHeight : fWidth;
+			cv::putText(image, cv::format("%.1lf", fResult), pts[2], 0, 1, cv::Scalar(0, 255, 0), 1);
 		}
 	}
 
-	dst = resultImage.clone();
-	return bResult;
-}
-
-bool m_bBlack	= true;
-bool m_bLine	= true;
-
-void CTab1::OnBnClickedBtnTest()
-{
-	SetMILContext();
-
-	auto sTime = GetTickCount64();
-
-	cv::Mat image = GetImage();
-	cv::Mat markImage, resultImage;
-	if (GetMarkImage(image, markImage)) {
-		cv::Mat blackImage, lineImage;
-		vector<Point> pts;
-
-		resultImage = markImage.clone();
-		if (resultImage.channels() == 1)
-			cvtColor(resultImage, resultImage, cv::COLOR_GRAY2BGR);
-
-		m_bBlack	= CheckBlack(markImage, blackImage, 100);
-		m_bLine		= CheckLine(markImage, lineImage, 40, 70);
-
-		if (!m_bBlack) {
-			cv::findNonZero(blackImage, pts);
-
-			for each (Point pt in pts) {
-				resultImage.at<Vec3b>(pt)[0] = 0;
-				resultImage.at<Vec3b>(pt)[1] = 0;
-				resultImage.at<Vec3b>(pt)[2] = 255;
-			}
-			cv::putText(resultImage, "Carbide NG", cv::Point(50, 100), 0, 1, cv::Scalar(0, 0, 255));
-		}
-		if (!m_bLine) {
-			cv::putText(resultImage, "Height NG", cv::Point(50, 150), 0, 1, cv::Scalar(0, 0, 255));
-		}
-		for (int y = 0; y < lineImage.rows; ++y) {
-			auto data = lineImage.ptr<uchar>(y);
-			for (int x = 0; x < lineImage.cols; ++x) {
-				if (data[x * 3 + 0] != 0 || data[x * 3 + 1] != 0 || data[x * 3 + 2] != 0) {
-					resultImage.at<Vec3b>(y, x)[0] = data[x * 3 + 0];
-					resultImage.at<Vec3b>(y, x)[1] = data[x * 3 + 1];
-					resultImage.at<Vec3b>(y, x)[2] = data[x * 3 + 2];
-				}
-			}
-		}
-
-		double dTime = (GetTickCount64() - sTime) * 0.001;
-		cv::putText(resultImage, cv::format("time : %.2lf (sec)", dTime), cv::Point(50, 50), 0, 1, cv::Scalar(255, 0, 0));
-		SetImage(resultImage);
-	}
-	else {
-		MessageBox(_T("Mark 찾기 실패"));
-	}
-
+	SetImage(image);
 	return;
 }
 
