@@ -7,7 +7,6 @@
 #define IDD_DIALOG1                     130
 #define IDD_DIALOG2                     132
 #define IDD_DIALOG_LUT                  137
-#define IDD_DIALOG3                     139
 #define IDC_TAB1                        1000
 #define IDC_STATIC_CAMERA_VIEW          1001
 #define IDC_STATIC_RESULT_VIEW          1002
@@ -76,6 +75,7 @@
 #define IDC_EDIT_HOUGH_CIRCLE_MAX       1040
 #define IDC_BTN_CONTOUR                 1040
 #define IDC_EDIT_ROTATE                 1041
+#define IDC_BTN_TEST2                   1041
 #define IDC_BTN_HOUGH_LINE              1042
 #define IDC_EDIT_RESIZE                 1042
 #define IDC_EDIT_DENOISE_SEARCH         1043
@@ -96,18 +96,11 @@
 #define IDC_STATIC_LUT_GRAPH_VIEW       1052
 #define IDC_CHECK_APPLY_LUT             1053
 #define IDC_EDIT_THRESH                 1054
-#define IDC_EDIT_MIL_GMF_PATH           1055
 #define IDC_EDIT_RESIZE3                1055
 #define IDC_EDIT_DIST                   1055
-#define IDC_BTN_MMF_LOAD                1056
-#define IDC_BTN_MODEL_FIND              1057
-#define IDC_EDIT_MIL_STR_PATH           1058
-#define IDC_BTN_MSR_LOAD                1059
-#define IDC_BTN_STRING_READ             1060
-#define IDC_EDIT_MIL_MCO_PATH           1061
-#define IDC_BTN_MCO_LOAD                1062
+#define IDC_BTN_MATCHING_TEMPLATE2      1056
+#define IDC_BTN_MATCHING_EDGE           1056
 #define IDC_BTN_STRING_READ2            1063
-#define IDC_BTN_CODE_READ               1063
 
 // Next default values for new objects
 // 

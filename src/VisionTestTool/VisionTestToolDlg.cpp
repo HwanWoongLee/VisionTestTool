@@ -5,7 +5,7 @@
 #include "afxdialogex.h"
 #include "CTab1.h"
 #include "CTab2.h"
-#include "CMILTab.h"
+//#include "CMILTab.h"
 #include "ImageProcess.h"
 
 #ifdef _DEBUG
@@ -77,10 +77,10 @@ BOOL CVisionTestToolDlg::OnInitDialog()
 	m_pTab2->MoveWindow(0, 20, rect.Width(), rect.Height() - 20);
 	m_pTab2->ShowWindow(SW_HIDE);
 
-	m_pTabMIL = new CMILTab(this);
-	m_pTabMIL->Create(IDD_DIALOG3, &m_Tab);
-	m_pTabMIL->MoveWindow(0, 20, rect.Width(), rect.Height() - 20);
-	m_pTabMIL->ShowWindow(SW_HIDE);
+	//m_pTabMIL = new CMILTab(this);
+	//m_pTabMIL->Create(IDD_DIALOG3, &m_Tab);
+	//m_pTabMIL->MoveWindow(0, 20, rect.Width(), rect.Height() - 20);
+	//m_pTabMIL->ShowWindow(SW_HIDE);
 
 	// Create Camera window
 	m_pCamera = new CTMatView();
@@ -168,19 +168,19 @@ void CVisionTestToolDlg::OnTcnSelchangeTab1(NMHDR* pNMHDR, LRESULT* pResult)
 		case 0: {
 			m_pTab1->ShowWindow(SW_SHOW);
 			m_pTab2->ShowWindow(SW_HIDE);
-			m_pTabMIL->ShowWindow(SW_HIDE);
+			//m_pTabMIL->ShowWindow(SW_HIDE);
 			break;
 		}
 		case 1: {
 			m_pTab1->ShowWindow(SW_HIDE);
 			m_pTab2->ShowWindow(SW_SHOW);
-			m_pTabMIL->ShowWindow(SW_HIDE);
+			//m_pTabMIL->ShowWindow(SW_HIDE);
 			break;
         }
 		case 2: {
 			m_pTab1->ShowWindow(SW_HIDE);
 			m_pTab2->ShowWindow(SW_HIDE);
-			m_pTabMIL->ShowWindow(SW_SHOW);
+			//m_pTabMIL->ShowWindow(SW_SHOW);
             break;
         }
 	}
@@ -313,8 +313,8 @@ void CVisionTestToolDlg::OnBnClickedBtnWhiteBalance()
 		cv::cvtColor(image, image, cv::COLOR_BGR2GRAY);
 
 	cv::Mat dst;
-	cv::Ptr<cv::xphoto::WhiteBalancer> wb = cv::xphoto::createSimpleWB();
-	wb->balanceWhite(image, dst);
+	//cv::Ptr<cv::xphoto::WhiteBalancer> wb = cv::xphoto::createSimpleWB();
+	//wb->balanceWhite(image, dst);
 
 	SetResultImage(dst);
 	return;

@@ -223,7 +223,8 @@ BOOL CTMatView::LoadImageFile() {
         CT2CA pszConvertedAnsiString(cstrPath);
         string strPath(pszConvertedAnsiString);
 
-        loadImg = imread(strPath, IMREAD_UNCHANGED);
+        // loadImg = imread(strPath, IMREAD_UNCHANGED);
+		loadImg = imread(strPath);
     }
 
     if (loadImg.empty()) {

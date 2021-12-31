@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 #include "VisionTestToolDlg.h";
 #include "ImageProcess.h"
-#include "MILModule.h"
+//#include "MILModule.h"
 
 // CTab1 대화 상자
 
@@ -75,11 +75,18 @@ void CTab1::SetImage(cv::Mat image, BOOL bRedraw) {
 	return;
 }
 
-cv::Mat	CTab1::RotateImage(cv::Mat image, double dAngle) {
+cv::Mat	CTab1::RotateImage(const cv::Mat& image, double dAngle) {
 	cv::Mat rotateImage;
-	cv::Mat R = cv::getRotationMatrix2D(cv::Point2f(image.cols / 2, image.rows / 2), dAngle, 1);
+	cv::Point2d base(image.cols / 2, image.rows / 2);
 
-	cv::warpAffine(image, rotateImage, R, image.size());
+	cv::Mat R			= cv::getRotationMatrix2D(base, dAngle, 1);
+
+	//cv::Rect bbox		= cv::RotatedRect(base, image.size(), dAngle).boundingRect();
+	//R.at<double>(0, 2)	+= bbox.width / 2.0 - base.x;
+	//R.at<double>(1, 2)	+= bbox.height / 2.0 - base.y;
+	//cv::warpAffine(image, rotateImage, R, bbox.size());
+
+	cv::warpAffine(image, rotateImage, R, image.size(), 1, BORDER_CONSTANT, cv::Scalar::all(0));
 
 	return rotateImage;
 }
@@ -100,6 +107,7 @@ BEGIN_MESSAGE_MAP(CTab1, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_TEST,				&CTab1::OnBnClickedBtnTest)
 	ON_WM_SHOWWINDOW()
 	ON_WM_HSCROLL()
+	ON_BN_CLICKED(IDC_BTN_TEST2, &CTab1::OnBnClickedBtnTest2)
 END_MESSAGE_MAP()
 
 
@@ -659,56 +667,6 @@ cv::Point2d rotatePoint(const cv::Point2d& inPoint, const cv::Point2d& center, c
 //	return;
 //}
 
-void CTab1::OnBnClickedBtnTest() {
-	cv::Mat image = GetImage();
-	cv::Mat gray;
-
-	if (image.channels() == 3)
-		cvtColor(image, gray, cv::COLOR_BGR2GRAY);
-	else
-		gray = image.clone();
-
-	int iThresh = 100;
-	int iLength = 40;
-
-	cv::threshold(gray, gray, 100, 255, cv::THRESH_BINARY_INV);
-
-	vector<vector<Point>> contours;
-	cv::findContours(gray, contours, cv::RETR_LIST, cv::CHAIN_APPROX_NONE);
-
-	for (int i = 0; i < contours.size(); ++i) {
-		auto bbox = cv::minAreaRect(contours[i]);
-		float fHeight = bbox.size.height;
-		float fWidth = bbox.size.width;
-
-		if (fHeight >= iLength || fWidth >= iLength) {
-			cv::Point2f pts[4];
-			bbox.points(pts);
-			cv::drawContours(image, contours, i, cv::Scalar(0, 0, 255), -1);
-
-			double d1 = m_pImageProcess->GetDistancePointToPoint(pts[0], pts[1]);
-			double d2 = m_pImageProcess->GetDistancePointToPoint(pts[1], pts[2]);
-
-			if (d1 < d2) {
-				cv::line(image, pts[0], pts[1], cv::Scalar(0, 255, 0), 1);
-				cv::line(image, pts[2], pts[3], cv::Scalar(0, 255, 0), 1);
-				cv::line(image, cv::Point((pts[0] + pts[1]) / 2), cv::Point((pts[2] + pts[3]) / 2), cv::Scalar(0, 255, 0), 1);
-			}
-			else {
-				cv::line(image, pts[1], pts[2], cv::Scalar(0, 255, 0), 1);
-				cv::line(image, pts[3], pts[0], cv::Scalar(0, 255, 0), 1);
-				cv::line(image, cv::Point((pts[1] + pts[2]) / 2), cv::Point((pts[3] + pts[0]) / 2), cv::Scalar(0, 255, 0), 1);
-			}
-
-			float fResult = fHeight > fWidth ? fHeight : fWidth;
-			cv::putText(image, cv::format("%.1lf", fResult), pts[2], 0, 1, cv::Scalar(0, 255, 0), 1);
-		}
-	}
-
-	SetImage(image);
-	return;
-}
-
 void CTab1::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	if (pScrollBar) {
@@ -741,3 +699,152 @@ void CTab1::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	}
 	CDialogEx::OnHScroll(nSBCode, nPos, pScrollBar);
 }
+
+#define PI 3.14159265358979
+std::thread* pThread = nullptr;
+
+double Degree(double radian) {
+	return radian * 180 / PI;
+}
+
+double Radian(double degree) {
+	return degree * PI / 180;
+}
+
+bool CTab1::CalDistance(cv::Mat image, double dTilt, double& dH, double& dDistance) {
+	cv::Mat canny;
+	
+	if (image.channels() == 3) {
+		cv::cvtColor(image, canny, cv::COLOR_BGR2GRAY);
+	}
+	else {
+		canny = image.clone();
+	}
+
+	cv::GaussianBlur(canny, canny, cv::Size(3, 3), 0);
+	cv::Canny(canny, canny, 100, 200);
+
+	cv::Point2d pt1, pt2;
+
+	cv::Mat rotImage;
+
+	if (m_pImageProcess->GetLine(canny, cv::Rect(0, 0, canny.cols, canny.rows), 0, 0, 3, (int)(canny.cols *0.66), eLINE_POSITION::TOP_LINE, pt1, pt2, FALSE, FALSE)) {
+		cv::line(image, pt1, pt2, cv::Scalar(0, 0, 255), 2);
+	}
+	else {
+		return false;
+	}
+	
+	dH = (pt1.y + pt2.y) / 2;
+	dDistance = dH / tan(Radian(dTilt));
+
+	return true;
+}
+
+bool CTab1::CalTilt(cv::Mat image, double dDistance, double& dH, double& dTilt) {
+	cv::Mat canny;
+
+	if (image.channels() == 3) {
+		cv::cvtColor(image, canny, cv::COLOR_BGR2GRAY);
+	}
+	else {
+		canny = image.clone();
+	}
+
+	cv::GaussianBlur(canny, canny, cv::Size(3, 3), 0);
+	cv::Canny(canny, canny, 100, 200);
+
+	cv::Point2d pt1, pt2;
+
+	cv::Mat rotImage;
+
+	if (m_pImageProcess->GetLine(canny, cv::Rect(0, 0, canny.cols, canny.rows), 0, 0, 3, (int)(canny.cols *0.66), eLINE_POSITION::TOP_LINE, pt1, pt2, FALSE, FALSE)) {
+		cv::line(image, pt1, pt2, cv::Scalar(0, 0, 255), 2);
+	}
+	else {
+		return false;
+	}
+
+	dH = (pt1.y + pt2.y) / 2;
+	dTilt = atan2(dH, dDistance);
+	dTilt = Degree(dTilt);
+
+	return true;
+}
+
+
+void CTab1::OnBnClickedBtnTest() {
+	pThread = new std::thread([&]() {
+		double dTilt, dHeight = 0;
+		int dDistance = 0;
+
+		cv::namedWindow("set distance");
+		cv::createTrackbar("distance", "set distance", &dDistance, 10000);
+
+		while (true) {
+			cv::Mat image = GetImage();
+			cv::Mat gray;
+
+			if (image.channels() == 3)
+				cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+			else
+				gray = image.clone();
+
+			if (CalTilt(image, dDistance, dHeight, dTilt)) {
+				cv::putText(image, cv::format("tilt : %.1lf", dTilt), cv::Point(50, 50), 0, 2, cv::Scalar(0, 255, 0), 2);
+				cv::putText(image, cv::format("dist : %d", dDistance), cv::Point(50, 150), 0, 2, cv::Scalar(0, 255, 0), 2);
+				cv::putText(image, cv::format("height : %.1lf", dHeight), cv::Point(50, 250), 0, 2, cv::Scalar(0, 255, 0), 2);
+			}
+
+			cv::resize(image, image, cv::Size(image.cols / 2, image.rows / 2));
+			cv::imshow("set distance", image);
+			cv::waitKey(10);
+		}
+	});
+
+	return;
+}
+
+void CTab1::OnBnClickedBtnTest2()
+{
+	// cv::Mat imageA = cv::imread("C:/Project/VisionTestTool-master/images/aa.jpg");
+	cv::Mat image = GetImage();
+
+	double dTilt		= 20;	// 현재 카메라의 tilt 값
+	double dDistance	= 0;	// tilt값 기준으로 받아올 distance
+	double dHeight		= 0;	// 측정한 수평선 높이
+
+	// distance 계산
+	if (CalDistance(image, dTilt, dHeight, dDistance)) {
+		cv::putText(image, cv::format("tilt : %.1lf", dTilt),		cv::Point(50, 50), 0, 2, cv::Scalar(0, 255, 0), 2);
+		cv::putText(image, cv::format("dist : %.1lf", dDistance),	cv::Point(50, 150), 0, 2, cv::Scalar(0, 255, 0), 2);
+		cv::putText(image, cv::format("height : %.1lf", dHeight),	cv::Point(50, 250), 0, 2, cv::Scalar(0, 255, 0), 2);
+	}
+
+	cv::Mat image2 = cv::imread("C:/Project/VisionTestTool-master/images/bbb.jpg");
+	// 가지고 있는 distance로 tilt 계산
+	if (CalTilt(image2, dDistance, dHeight, dTilt)) {
+		cv::putText(image2, cv::format("tilt : %.1lf", dTilt),		cv::Point(50, 50), 0, 2,	cv::Scalar(0, 0, 255), 2);
+		cv::putText(image2, cv::format("dist : %.1lf", dDistance),	cv::Point(50, 150), 0, 2,	cv::Scalar(0, 0, 255), 2);
+		cv::putText(image2, cv::format("height : %.1lf", dHeight), cv::Point(50, 250), 0, 2, cv::Scalar(0, 0, 255), 2);
+	}
+
+	cv::Mat image3 = cv::imread("C:/Project/VisionTestTool-master/images/ccc.jpg");
+	// 가지고 있는 distance로 tilt 계산
+	if (CalTilt(image3, dDistance, dHeight, dTilt)) {
+		cv::putText(image3, cv::format("tilt : %.1lf", dTilt),		cv::Point(50, 50), 0, 2, cv::Scalar(0, 0, 255), 2);
+		cv::putText(image3, cv::format("dist : %.1lf", dDistance),	cv::Point(50, 150), 0, 2, cv::Scalar(0, 0, 255), 2);
+		cv::putText(image3, cv::format("height : %.1lf", dHeight), cv::Point(50, 250), 0, 2, cv::Scalar(0, 0, 255), 2);
+	}
+
+	cv::resize(image, image, cv::Size(image.cols / 2, image.rows / 2));
+	cv::resize(image2, image2, cv::Size(image2.cols / 2, image2.rows / 2));
+	cv::resize(image3, image3, cv::Size(image3.cols / 2, image3.rows / 2));
+
+	cv::imshow("cal dist", image);
+	cv::imshow("cal tilt", image2);
+	cv::imshow("cal tilt2", image3);
+
+	return;
+}
+

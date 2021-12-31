@@ -8,6 +8,8 @@
 #include "ImageProcess.h"
 #include "VisionTestToolDlg.h"
 #include "LUTManipulator.h";
+#include <omp.h>
+
 
 // CTab2 대화 상자
 
@@ -79,6 +81,7 @@ BEGIN_MESSAGE_MAP(CTab2, CDialogEx)
 	ON_WM_SHOWWINDOW()
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_BTN_WATERSHED, &CTab2::OnBnClickedBtnWatershed)
+	ON_BN_CLICKED(IDC_BTN_MATCHING_EDGE, &CTab2::OnBnClickedBtnMatchingEdge)
 END_MESSAGE_MAP()
 
 
@@ -121,7 +124,6 @@ void CTab2::OnShowWindow(BOOL bShow, UINT nStatus)
 		if (!m_markView.Create(NULL, NULL, WS_VISIBLE | WS_CHILD | WS_BORDER, CRect(), this, IDC_STATIC_MATCHING_MARK)) {
 			return;
 		}
-		m_markView.ShowTool(false);
 		auto pWnd = GetDlgItem(IDC_STATIC_MATCHING_MARK);
 		CRect rect;
 		if (pWnd) {
@@ -129,6 +131,7 @@ void CTab2::OnShowWindow(BOOL bShow, UINT nStatus)
 			ScreenToClient(rect);
 			m_markView.MoveWindow(rect);
 		}
+		m_markView.ShowTool(false);
 
         pWnd = GetDlgItem(IDC_STATIC_LUT_GRAPH_VIEW);
         if (pWnd) {
@@ -544,6 +547,144 @@ void CTab2::OnBnClickedBtnMatchingTemplate()
 	return;
 }
 
+#include <concurrent_vector.h>
+
+void CTab2::OnBnClickedBtnMatchingEdge()
+{
+	cv::Mat orgImage = GetImage();
+	double dImageScale = 2.0;
+	
+	// 1. get image
+	cv::Mat image = GetImage();
+	if (image.channels() == 3)
+		cv::cvtColor(image, image, cv::COLOR_BGR2GRAY);
+	if (m_markImage.channels() == 3)
+		cv::cvtColor(m_markImage, m_markImage, cv::COLOR_BGR2GRAY);
+
+	// m_markImage = image(cv::Rect(image.cols / 3, image.rows / 3, image.cols / 3, image.rows / 3)).clone();
+
+	// 2. get mark image & set edge
+	cv::Mat mark = m_markImage.clone();
+	cv::Mat orgMark;
+
+	cv::resize(image, image, cv::Size(image.cols / dImageScale, image.rows / dImageScale));
+	cv::resize(mark, mark,	cv::Size(mark.cols / dImageScale, mark.rows / dImageScale));
+
+	cv::GaussianBlur(image, image, cv::Size(3, 3), 0);
+	cv::Canny(image, image, 255, 255);
+	cv::GaussianBlur(mark, mark, cv::Size(3, 3), 0);
+	cv::Canny(mark, mark, 255, 255);
+	cv::GaussianBlur(m_markImage, orgMark, cv::Size(3, 3), 0);
+	cv::Canny(orgMark, orgMark, 255, 255);
+
+	// 3. sliding mark box on image
+	double					dResultScore = 0;
+	int						iResultAngle = 0;
+	cv::Point				ptResult;
+	std::vector<cv::Point>	ptMarks[360];
+	std::vector<int>		markCounts;
+
+	struct _RESULT {
+		int			angle;
+		double		score;
+		cv::Point	pt;
+	};
+	Concurrency::concurrent_vector<_RESULT> results;
+
+	auto sTime = GetTickCount64();
+	//////////////////////////////////////////////////////////////////////////////////
+
+#pragma omp parallel for
+	for (int angle = 0; angle < 30; ++angle) {
+		cv::Mat rotImage = RotateImage(mark, angle);
+		cv::threshold(rotImage, rotImage, 180, 255, cv::THRESH_BINARY);
+		cv::findNonZero(rotImage, ptMarks[angle]);
+	}
+
+
+	uchar* data = image.data;
+	int iWidth = image.cols;
+	int iHeight = image.rows;
+
+#pragma omp parallel for
+	for (int angle = 0; angle < 30; ++angle) {
+		for (int y = 0; y < iHeight; ++y) {
+			for (int x = 0; x < iWidth; ++x) {
+				if ((x + mark.cols < iWidth) && (y + mark.rows < iHeight)) {
+					double dScore = .0;
+					int iMarkSize = ptMarks[angle].size();
+
+					for (int m = 0; m < iMarkSize; ++m) {
+						int ix = ptMarks[angle][m].x + x;
+						int iy = ptMarks[angle][m].y + y;
+					
+						if (data[iy * iWidth + ix] == 255) {
+							dScore++;
+						}
+					}
+					dScore = dScore / (double)iMarkSize * 100;
+					
+					_RESULT r;
+					r.angle = angle;
+					r.score = dScore;
+					r.pt = cv::Point(x, y);
+					results.push_back(r);
+				}
+			}
+		}
+	}
+	int iResultSize = results.size();
+#pragma omp parallel for
+	for (int i = 0; i < iResultSize; ++i) {
+		if (dResultScore < results[i].score) {
+			iResultAngle	= results[i].angle;
+			dResultScore	= results[i].score;
+			ptResult		= results[i].pt;
+		}
+	}
+	//////////////////////////////////////////////////////////////////////////////////
+	auto tTime = (GetTickCount64() - sTime);
+
+	// 4. draw result
+	if (image.channels() == 1)
+		cv::cvtColor(image, image, cv::COLOR_GRAY2BGR);
+
+	
+	ptResult *= dImageScale;
+
+	cv::rectangle(orgImage, cv::Rect(ptResult.x, ptResult.y, mark.cols * dImageScale, mark.rows * dImageScale), cv::Scalar(0, 0, 255), 1);
+	cv::putText(orgImage, cv::format("%.1lf", dResultScore), ptResult, 0, 1, cv::Scalar(0, 0, 255), 1);
+	cv::putText(orgImage, cv::format("%dms", tTime), cv::Point(50, 50), 0, 1, cv::Scalar(0, 0, 255), 1);
+	cv::putText(orgImage, cv::format("%d", iResultAngle), cv::Point(50, 100), 0, 1, cv::Scalar(0, 0, 255), 1);
+	
+
+	orgMark = RotateImage(orgMark, iResultAngle);
+	data = orgMark.data;
+#pragma omp parallel for
+	for (int y = 0; y < orgMark.rows; ++y) {
+		for (int x = 0; x < orgMark.cols; ++x) {
+			if (data[y * orgMark.cols + x] != 0) {
+				orgImage.at<Vec3b>(y + ptResult.y, x + ptResult.x)[0] = 0;
+				orgImage.at<Vec3b>(y + ptResult.y, x + ptResult.x)[1] = 0;
+				orgImage.at<Vec3b>(y + ptResult.y, x + ptResult.x)[2] = 255;
+			}
+		}
+	}
+
+	//for (int i = 0; i < ptMarks[iResultAngle].size(); ++i) {
+	//	int x = ptMarks[iResultAngle][i].x * dImageScale;
+	//	int y = ptMarks[iResultAngle][i].y * dImageScale;
+	//
+	//	orgImage.at<Vec3b>(y + ptResult.y, x + ptResult.x)[0] = 0;
+	//	orgImage.at<Vec3b>(y + ptResult.y, x + ptResult.x)[1] = 0;
+	//	orgImage.at<Vec3b>(y + ptResult.y, x + ptResult.x)[2] = 255;
+	//}
+
+	SetImage(orgImage);
+
+	return;
+}
+
 
 void CTab2::OnBnClickedBtnInitLut()
 {
@@ -567,4 +708,3 @@ void CTab2::OnTimer(UINT_PTR nIDEvent)
 	}
 	CTab1::OnTimer(nIDEvent);
 }
-

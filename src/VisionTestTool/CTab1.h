@@ -4,7 +4,7 @@
 // CTab1 대화 상자
 class CVisionTestToolDlg;
 class CImageProcess;
-class CMILModule;
+//class CMILModule;
 
 class CTab1 : public CDialogEx
 {
@@ -24,7 +24,7 @@ protected:
 	CImageProcess*			m_pImageProcess = nullptr;
 
 	cv::Mat GetImage();
-	cv::Mat RotateImage(cv::Mat image, double dAngle);
+	cv::Mat RotateImage(const cv::Mat& image, double dAngle);
 	void SetImage(cv::Mat image, BOOL bRedraw = TRUE);
 
 private:
@@ -63,6 +63,9 @@ private:
 	int m_radioSobel;
 
 private:
+	bool CalDistance(cv::Mat image, double dTilt, double& dH, double& dDistance);
+	bool CalTilt(cv::Mat image, double dDistance, double& dH, double& dTilt);
+
 	//// >> 점안액 TEST
 	//CMILModule* m_pMIL = nullptr;
 	//
@@ -93,4 +96,5 @@ private:
 
 public:
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+	afx_msg void OnBnClickedBtnTest2();
 };

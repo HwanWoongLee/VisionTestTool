@@ -30,14 +30,19 @@
 
 // OpenCV
 #include "opencv2/opencv.hpp"
-#include "opencv2/xphoto/white_balance.hpp"
+//#include "opencv2/xphoto/white_balance.hpp"
+
+//#ifdef DEBUG
+//#pragma comment(lib, "opencv_world452d.lib")
+//#else
+//#pragma comment(lib, "opencv_world452.lib")
+//#endif
 
 #ifdef DEBUG
-#pragma comment(lib, "opencv_world452d.lib")
+#pragma comment(lib, "opencv_world454d.lib")
 #else
-#pragma comment(lib, "opencv_world452.lib")
+#pragma comment(lib, "opencv_world454.lib")
 #endif
-
 
 #include "TMatView.h"
 
