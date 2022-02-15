@@ -25,6 +25,7 @@ protected:
 
 	cv::Mat GetImage();
 	cv::Mat RotateImage(const cv::Mat& image, double dAngle);
+	cv::Mat ShiftImage(const cv::Mat& image, int iX);
 	void SetImage(cv::Mat image, BOOL bRedraw = TRUE);
 
 private:
@@ -97,4 +98,5 @@ private:
 public:
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg void OnBnClickedBtnTest2();
+	afx_msg void OnBnClickedBtnTest3();
 };

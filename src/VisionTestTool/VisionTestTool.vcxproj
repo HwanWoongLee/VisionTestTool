@@ -173,6 +173,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>./;$(SolutionDir)include;C:\opencv_org\include;C:\OpenCV\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -193,10 +194,14 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\guidedfilter.h" />
+    <ClInclude Include="..\..\include\hazeremoval.h" />
     <ClInclude Include="..\..\include\TMatView.h" />
     <ClInclude Include="..\..\include\TViewer.h" />
+    <ClInclude Include="CEdgeDetector.h" />
     <ClInclude Include="CTab1.h" />
     <ClInclude Include="CTab2.h" />
+    <ClInclude Include="CTab3.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="ImageProcess.h" />
     <ClInclude Include="LUTManipulator.h" />
@@ -207,10 +212,14 @@
     <ClInclude Include="VisionTestToolDlg.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\include\guidedfilter.cpp" />
+    <ClCompile Include="..\..\include\hazeremoval.cpp" />
     <ClCompile Include="..\..\include\TMatView.cpp" />
     <ClCompile Include="..\..\include\TViewer.cpp" />
+    <ClCompile Include="CEdgeDetector.cpp" />
     <ClCompile Include="CTab1.cpp" />
     <ClCompile Include="CTab2.cpp" />
+    <ClCompile Include="CTab3.cpp" />
     <ClCompile Include="ImageProcess.cpp" />
     <ClCompile Include="LUTManipulator.cpp" />
     <ClCompile Include="pch.cpp">

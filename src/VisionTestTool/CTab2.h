@@ -32,11 +32,13 @@ private:
 	CEdit		m_editRansacThresh2;
 	CEdit		m_editRansacSize;
 	CEdit		m_editResize;
-	CEdit		m_editRotate;
 	CEdit		m_editThresh;
 	CEdit		m_editDist;
+	CEdit		m_editRotate;
+	CEdit		m_editShiftX;
 
 	CSliderCtrl m_sliderRotate;
+	CSliderCtrl m_sliderShiftX;
 
 	CComboBox	m_comboRansacPos;
 	CComboBox	m_comboContourMode;
@@ -71,4 +73,5 @@ public:
 	afx_msg void OnBnClickedBtnWatershed();
 
 	afx_msg void OnBnClickedBtnMatchingEdge();
+	afx_msg void OnChangeEditShiftX();
 };

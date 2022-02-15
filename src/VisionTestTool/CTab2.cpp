@@ -39,6 +39,8 @@ void CTab2::ApplyLUT() {
 		if (lut.empty() || image.empty())
 			return;
 
+		//cv::cvtColor(image, image, cv::COLOR_BGR2GRAY);
+		//cv::cvtColor(lut, lut, cv::COLOR_BGR2GRAY);
 		cv::Mat dst;
 		cv::LUT(image, lut, dst);
 
@@ -62,6 +64,8 @@ void CTab2::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK_APPLY_LUT, m_checkLUT);
 	DDX_Control(pDX, IDC_EDIT_THRESH, m_editThresh);
 	DDX_Control(pDX, IDC_EDIT_DIST, m_editDist);
+	DDX_Control(pDX, IDC_SLIDER_SH_X, m_sliderShiftX);
+	DDX_Control(pDX, IDC_EDIT_SHIFT_X, m_editShiftX);
 }
 
 
@@ -82,6 +86,7 @@ BEGIN_MESSAGE_MAP(CTab2, CDialogEx)
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_BTN_WATERSHED, &CTab2::OnBnClickedBtnWatershed)
 	ON_BN_CLICKED(IDC_BTN_MATCHING_EDGE, &CTab2::OnBnClickedBtnMatchingEdge)
+	ON_EN_CHANGE(IDC_EDIT_SHIFT_X, &CTab2::OnChangeEditShiftX)
 END_MESSAGE_MAP()
 
 
@@ -101,7 +106,13 @@ void CTab2::OnShowWindow(BOOL bShow, UINT nStatus)
 		m_sliderRotate.SetTicFreq(45);
 		m_sliderRotate.SetPageSize(10);
 
+		m_sliderShiftX.SetRange(0, 360);
+		m_sliderShiftX.SetPos(0);
+		m_sliderShiftX.SetTicFreq(45);
+		m_sliderShiftX.SetPageSize(10);
+
 		m_editRotate.SetWindowTextW(_T("0"));
+		m_editShiftX.SetWindowTextW(_T("0"));
 		m_editResize.SetWindowTextW(_T("1.0"));
 
 		m_editThresh.SetWindowTextW(_T("100"));
@@ -313,6 +324,17 @@ void CTab2::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
                 SetImage(RotateImage(image, iPos), FALSE);
             }
 		}
+		else if (pScrollBar == (CScrollBar*)&m_sliderShiftX) {
+			int iPos = m_sliderShiftX.GetPos();
+			CString str;
+			str.Format(_T("%d"), iPos);
+			m_editShiftX.SetWindowTextW(str);
+
+			cv::Mat image = m_pParent->GetShowImage();
+			if (!image.empty()) {
+				SetImage(ShiftImage(image, iPos), FALSE);
+			}
+		}
 	}
 	CDialogEx::OnHScroll(nSBCode, nPos, pScrollBar);
 }
@@ -332,6 +354,23 @@ void CTab2::OnEnChangeEditRotate()
 
 	return;
 }
+
+
+void CTab2::OnChangeEditShiftX()
+{
+	CString str;
+	m_editShiftX.GetWindowTextW(str);
+	int iPos = _ttoi(str);
+	m_sliderShiftX.SetPos(iPos);
+
+	cv::Mat image = m_pParent->GetShowImage();
+	if (!image.empty()) {
+		SetImage(ShiftImage(image, iPos), FALSE);
+	}
+
+	return;
+}
+
 
 
 void CTab2::OnBnClickedBtnResize()

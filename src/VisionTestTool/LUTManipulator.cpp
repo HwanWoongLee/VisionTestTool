@@ -26,8 +26,8 @@ void LUTManipulator::DoDataExchange(CDataExchange* pDX)
 
 void LUTManipulator::InitPts() {
 	m_pts.clear();
-	m_pts.push_back(cv::Point(0, 0));
-	m_pts.push_back(cv::Point(255, 255));
+	m_pts.push_back(cv::Point(0, 255));
+	m_pts.push_back(cv::Point(255, 0));
 
 	if(IsWindow(m_hWnd))
 		Invalidate(FALSE);
@@ -42,6 +42,9 @@ cv::Mat LUTManipulator::GetLUT() {
 		for (int i = 0; i < nCount; ++i) {
 			fy += m_params[i] * pow(x, i);
 		}
+		fy = fabsf(fy - 255);
+		if (fy < 0)			fy = 0;
+		else if (fy > 255)	fy = 255;
 
 		auto data = lut.data;
 		data[x * 3 + 0] = fy;
@@ -72,12 +75,11 @@ void LUTManipulator::DrawGraph(CDC& pDC, double dWidth, double dHeight) {
 		for (int n = 0; n < nCount; ++n) {
 			fy += m_params[n] * pow(x, n);
 		}
-		if (fy < 0) {
+
+		if (fy < 0)
 			fy = 0;
-		}
-		else if (fy > 255) {
+		else if (fy > 255)
 			fy = 255;
-		}
 
 		values.push_back(fy);
 	}
@@ -103,7 +105,7 @@ bool LUTManipulator::CheckMousePointInLine(const CPoint& pt) {
 		fy += m_params[i] * pow(real_pt.x, i);
 	}
 	
-    if (abs(fy - real_pt.y) < 5)
+    if (abs(fy - real_pt.y) < 10)
         return true;
 
 	return false;
@@ -113,7 +115,7 @@ bool LUTManipulator::CheckInPoint(const CPoint& pt, int& index_pt) {
 	cv::Point read_pt = cv::Point(pt.x / m_dWidth, pt.y / m_dHeight);
 
 	for (int i = 0; i < m_pts.size(); ++i) {
-		if (sqrt(pow(m_pts[i].x - read_pt.x, 2) + pow(m_pts[i].y - read_pt.y, 2)) < 5) {
+		if (sqrt(pow(m_pts[i].x - read_pt.x, 2) + pow(m_pts[i].y - read_pt.y, 2)) < 10) {
 			index_pt = i;
 			return true;
 		}
@@ -173,13 +175,12 @@ void LUTManipulator::OnPaint()
 	pen.DeleteObject();
 
 	for (int i = 0; i < m_pts.size(); ++i) {
-		CRect ptRect = CRect(m_pts[i].x * m_dWidth - 3, m_pts[i].y * m_dHeight - 3, m_pts[i].x * m_dWidth + 3, m_pts[i].y * m_dHeight + 3);
+		int x = m_pts[i].x;
+		int y = m_pts[i].y;
+		
+		CRect ptRect = CRect(x * m_dWidth - 3, y * m_dHeight - 3, x * m_dWidth + 3, y * m_dHeight + 3);
 		pDC.FillSolidRect(ptRect, RGB(255, 0, 0));
 	}
-
-	// CString str;
-	// str.Format(_T("button down : %d"), m_bLBDown);
-	// pDC.TextOutW(20, 20, str);
 
 	return;
 }
@@ -187,6 +188,8 @@ void LUTManipulator::OnPaint()
 
 void LUTManipulator::OnLButtonDown(UINT nFlags, CPoint point)
 {
+	
+
 	if (CheckMousePointInLine(point)) {
 		m_bLBDown = true;
 
@@ -217,6 +220,7 @@ void LUTManipulator::OnMouseMove(UINT nFlags, CPoint point)
 		else {
 			m_pts.push_back(cv::Point(point.x / m_dWidth, point.y / m_dHeight));
 		}
+
 		Invalidate(FALSE);
 	}
 	CDialogEx::OnMouseMove(nFlags, point);

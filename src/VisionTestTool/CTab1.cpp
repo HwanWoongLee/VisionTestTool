@@ -86,9 +86,19 @@ cv::Mat	CTab1::RotateImage(const cv::Mat& image, double dAngle) {
 	//R.at<double>(1, 2)	+= bbox.height / 2.0 - base.y;
 	//cv::warpAffine(image, rotateImage, R, bbox.size());
 
-	cv::warpAffine(image, rotateImage, R, image.size(), 1, BORDER_CONSTANT, cv::Scalar::all(0));
+	cv::warpAffine(image, rotateImage, R, image.size(), 1, 0, cv::Scalar::all(0));
 
 	return rotateImage;
+}
+
+cv::Mat CTab1::ShiftImage(const cv::Mat& image, int iX) {
+	cv::Mat shiftImage;
+	int iY = 0;
+
+	Mat trans_mat = (Mat_<double>(2, 3) << 1, 0, iX, 0, 1, iY);
+	warpAffine(image, shiftImage, trans_mat, image.size());
+	
+	return shiftImage;
 }
 
 BEGIN_MESSAGE_MAP(CTab1, CDialogEx)
@@ -108,6 +118,7 @@ BEGIN_MESSAGE_MAP(CTab1, CDialogEx)
 	ON_WM_SHOWWINDOW()
 	ON_WM_HSCROLL()
 	ON_BN_CLICKED(IDC_BTN_TEST2, &CTab1::OnBnClickedBtnTest2)
+	ON_BN_CLICKED(IDC_BTN_TEST3, &CTab1::OnBnClickedBtnTest3)
 END_MESSAGE_MAP()
 
 
@@ -848,3 +859,51 @@ void CTab1::OnBnClickedBtnTest2()
 	return;
 }
 
+
+#include "CEdgeDetector.h"
+
+void CTab1::OnBnClickedBtnTest3() {
+	CEdgeDetector detector;
+	//RESULT_DATA result;
+
+	cv::Mat image = GetImage();
+	cv::Mat mark = cv::imread("C:/Project/VisionTestTool/images/base.jpg");
+	cv::Rect roiRect = cv::Rect(0, 0, image.cols, image.rows);
+
+	// detect
+	auto sTime = GetTickCount64();
+	auto result = detector.Detect(image, mark, roiRect, 200, 255, 10);
+
+	auto tTime = (GetTickCount64() - sTime) * 0.001;
+
+	if (result.image.empty()) {
+		return;
+	}
+
+	// draw result image
+	cv::Mat draw_image = result.image.clone();
+	if (draw_image.channels() == 1)
+		cv::cvtColor(draw_image, draw_image, cv::COLOR_GRAY2BGR);
+
+	cv::putText(draw_image, cv::format("angle : %d",		result.angle),	cv::Point(50, 100), 0, 3, cv::Scalar(0,0,0), 12);
+	cv::putText(draw_image, cv::format("time : %.3lf",		tTime),			cv::Point(50, 180), 0, 3, cv::Scalar(0,0,0), 12);
+	cv::putText(draw_image, cv::format("score : %.1lf%%",	result.score),	cv::Point(50, 260), 0, 3, cv::Scalar(0,0,0), 12);
+	cv::putText(draw_image, cv::format("shift : %d",		result.pt.x),	cv::Point(50, 340), 0, 3, cv::Scalar(0,0,0), 12);
+	cv::putText(draw_image, cv::format("angle : %d",		result.angle),	cv::Point(50, 100), 0, 3, cv::Scalar(0,0,255), 3);
+	cv::putText(draw_image, cv::format("time : %.3lf",		tTime),			cv::Point(50, 180), 0, 3, cv::Scalar(0,0,255), 3);
+	cv::putText(draw_image, cv::format("score : %.1lf%%",	result.score),	cv::Point(50, 260), 0, 3, cv::Scalar(0,0,255), 3);
+	cv::putText(draw_image, cv::format("shift : %d",		result.pt.x),	cv::Point(50, 340), 0, 3, cv::Scalar(0,0,255), 3);
+
+	double min_score = 30.0;
+
+	if (result.score < min_score) {
+		AfxMessageBox(_T("matching error"));
+	}
+
+	SetImage(draw_image);
+
+	//cv::imshow("correction", detector.CorrectedTilt(image, result.angle));
+	//cv::waitKey(10);
+
+	return;
+}
